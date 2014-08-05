@@ -1,0 +1,30 @@
+{
+  "name": "vigour-spriteMaker",
+  "version": "0.0.0",
+  "author": "Vigour.io <dev@vigour.io>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vigour-io/vigour-spriteMaker.git"
+  },
+  "main": "./index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "description": "Makes a sprite out of an array of urls",
+  "bugs": {
+    "url": "https://github.com/vigour-io/vigour-spriteMaker/issues"
+  },
+  "homepage": "https://github.com/vigour-io/vigour-spriteMaker",
+  "dependencies": {
+    "body-parser": "^1.5.2",
+    "express": "^4.7.4",
+    "gm": "^1.16.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "javascript",
+    "sprites",
+    "graphicsMagick"
+  ],
+  "license": "ISC"
+}
