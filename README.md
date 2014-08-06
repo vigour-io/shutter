@@ -8,10 +8,10 @@ ImageMagick `brew install ImageMagick`
 
 <a name='api'></a>
 ## API (Usage)
-Issue a GET request to one of the following addresses to obtain the sprite corresponding to the provided parameters.
-
-- `/:country/:lang/shows/:width/:height`
-- `/:country/:lang/episodes/:showId/:seasonId/:width/:height`
+- Start the server (`npm start`)
+- Issue a GET request to one of the following addresses to obtain the sprite corresponding to the provided parameters.
+    + `/:country/:lang/shows/:width/:height`
+    + `/:country/:lang/episodes/:showId/:seasonId/:width/:height`
 
 ### Parameters
 - `:country` A full country name, like **Germany**
