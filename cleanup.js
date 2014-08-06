@@ -6,7 +6,7 @@ module.exports = exports = function (files, basePath) {
 	for (i = 0; i < l; i += 1) {
 		fs.unlink(files[i], function (err) {
 			if (err) {
-				console.log('Error:', err)
+				console.log("Can't remove file:", err)
 			}
 		})
 	}
