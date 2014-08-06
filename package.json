@@ -7,6 +7,9 @@
     "url": "https://github.com/vigour-io/vigour-spriteMaker.git"
   },
   "main": "./index.js",
+  "scripts": {
+    "start": "supervisor --ignore README.md,LICENSE,.gitignore,.DS_Store,package.json,todo,tmp index.js"
+  },
   "engines": {
     "node": ">=0.10.0"
   },
@@ -20,7 +23,9 @@
     "express": "^4.7.4",
     "gm": "^1.16.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+
+  },
   "keywords": [
     "javascript",
     "sprites",
