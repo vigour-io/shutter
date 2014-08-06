@@ -2,11 +2,11 @@ var gm = require('gm')
 	, config = require('./config')
 	, cleanup = require('./cleanup')
 
-module.exports = exports = function (images, dimensions, cb) {
-	createSprite(images, dimensions, '.resized.' + config.spriteFormat, 'sprite', cb)
+module.exports = exports = function (dir, images, dimensions, cb) {
+	createSprite(dir, images, dimensions, '.resized.' + config.spriteFormat, 'sprite', cb)
 }
 
-function createSprite (images, dimensions, resizedSuffix, name, cb) {
+function createSprite (dir, images, dimensions, resizedSuffix, name, cb) {
 	var l = images.length
 		, nbLeft = l
 		, i
@@ -42,11 +42,11 @@ function createSprite (images, dimensions, resizedSuffix, name, cb) {
 							if (err) {
 								console.log('Error:', err)
 								cb(err)
-								cleanup(resizedImages)
+								cleanup(dir)
 							} else {
 								nbLeft -= 1
 								if (nbLeft === 0) {
-									buildSprite(resizedImages, name, cb)
+									buildSprite(dir, resizedImages, name, cb)
 								}
 							}
 						})
@@ -56,22 +56,23 @@ function createSprite (images, dimensions, resizedSuffix, name, cb) {
 	}
 }
 
-function buildSprite (images, name, cb) {
+function buildSprite (dir, images, name, cb) {
 	var sprite = gm(images[0])
 		, l = images.length
 		, i
 		, horizontal = true
+		, spritePath = dir + '/' + name + '.' + config.spriteFormat
 	for (i = 1; i < l; i += 1) {
 		sprite.append(images[i], horizontal)
 	}
-	sprite.write(name + '.' + config.spriteFormat, function (err) {
+	sprite.write(spritePath, function (err) {
 		if (err) {
 			console.log('Error: ', err)
 			cb(err)
-			cleanup(images)
+			cleanup(dir)
 		} else {
-			cb(null, name + '.' + config.spriteFormat)
-			cleanup(images)
+			cb(null, spritePath)
+			cleanup(dir)
 		}
 	})
 }

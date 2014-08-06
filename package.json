@@ -21,11 +21,10 @@
   "dependencies": {
     "body-parser": "^1.5.2",
     "express": "^4.7.4",
-    "gm": "^1.16.0"
+    "gm": "^1.16.0",
+    "rimraf": "^2.2.8"
   },
-  "devDependencies": {
-
-  },
+  "devDependencies": {},
   "keywords": [
     "javascript",
     "sprites",

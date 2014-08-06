@@ -59,53 +59,62 @@ function dive (obj, path) {
 }
 
 function getSprite (req, res, next, items) {
-	var ids = []
-		, l
-		, i
-		, nbLeft
-		, id
-		, url
-		, path
-		, paths = []
-	for (item in items) {
-		ids.push(items[item].img)
-	}
-	nbLeft = l = ids.length
-	if (l === 0) {
-		res.end(config.invalidRequestMessage)
-	} else {
-		for (i = 0; i < l; i += 1) {
-			id = ids[i]
-			url = urlFromId(id)
-			path = 'tmp/' + ids[i]
-			paths.push(path)
-			download(url, path, function (err) {
-				if (err) {
-					console.log("Can't download " + url, err)
-					res.status(500).end("Error downloading " + url + ": " + err)
-					cleanup(paths)
-				} else {
-					nbLeft -= 1
-					if (nbLeft === 0) {
-						createSprite(paths
-							, {
-								width: req.params.width
-								, height: req.params.height
-							}, function (err, spritePath) {
-								if (err) {
-									console.log("Can't create sprite", err)
-									res.status(500).end("Error creating sprite: " + err)
-									cleanup(paths)
-								} else {
-									res.sendfile(spritePath)
-									cleanup(paths)
-								}
-							})
-					}
+	var tempDirectory = config.tempDirectory + '/' + Math.random().toString().slice(1)
+	fs.mkdir(tempDirectory, function (err) {
+		var ids = []
+			, l
+			, i
+			, nbLeft
+			, id
+			, url
+			, path
+			, paths = []
+		if (err) {
+			console.log("Can't create temp directory " + tempDirectory, err)
+			res.status(500).end("Error creating temp directory " + tempDirectory, err)
+		} else {
+			for (item in items) {
+				ids.push(items[item].img)
+			}
+			nbLeft = l = ids.length
+			if (l === 0) {
+				res.end(config.invalidRequestMessage)
+			} else {
+				for (i = 0; i < l; i += 1) {
+					id = ids[i]
+					url = urlFromId(id)
+					path = tempDirectory + '/' + ids[i]
+					paths.push(path)
+					download(url, path, function (err) {
+						if (err) {
+							console.log("Can't download " + url, err)
+							res.status(500).end("Error downloading " + url + ": " + err)
+							cleanup(tempDirectory)
+						} else {
+							nbLeft -= 1
+							if (nbLeft === 0) {
+								createSprite(tempDirectory
+									, paths
+									, {
+										width: req.params.width
+										, height: req.params.height
+									}, function (err, spritePath) {
+										if (err) {
+											console.log("Can't create sprite", err)
+											res.status(500).end("Error creating sprite: " + err)
+											cleanup(tempDirectory)
+										} else {
+											res.sendfile(spritePath)
+											cleanup(tempDirectory)
+										}
+									})
+							}
+						}
+					})
 				}
-			})
+			}
 		}
-	}
+	})
 }
 
 function urlFromId (id) {

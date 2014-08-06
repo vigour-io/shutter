@@ -25,5 +25,6 @@ module.exports = exports = {
 		, height: large.height * 2
 	}
 	, spriteFormat: 'jpg'
+	, tempDirectory: 'tmp'
 	, invalidRequestMessage: "Invalid request. Make sure you are respecting the sprite maker api (https://github.com/vigour-io/vigour-spriteMaker/blob/master/README.md#user-content-api) and that the requested data exists."
 }
