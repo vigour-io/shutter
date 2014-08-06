@@ -5,6 +5,7 @@ var express = require('express')
 	, createSprite = require('./spriteMaker')
 	, data = require('./data')
 	, config = require('./config')
+	, cleanup = require('./cleanup')
 	, port = 8080
 
 app = express();
@@ -82,6 +83,7 @@ function getSprite (req, res, next, items) {
 				if (err) {
 					console.log("Can't download " + url, err)
 					res.end(500)
+					cleanup(paths)
 				} else {
 					nbLeft -= 1
 					if (nbLeft === 0) {
@@ -89,8 +91,10 @@ function getSprite (req, res, next, items) {
 							if (err) {
 								console.log("Can't create sprite", err)
 								res.end(500)
+								cleanup(paths)
 							} else {
 								res.sendfile(spritePath)
+								cleanup(paths)
 							}
 						})
 					}

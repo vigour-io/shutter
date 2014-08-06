@@ -1,9 +1,10 @@
 var gm = require('gm')
-	, config = require('./config.js')
+	, config = require('./config')
+	, cleanup = require('./cleanup')
 
 module.exports = exports = function (images, version, cb) {
 	if (config[version] && config[version].width && config[version].height) {
-		createSprite(images, config[version], '.resized.png', 'sprite', cb)
+		createSprite(images, config[version], '.resized.' + config.spriteFormat, 'sprite', cb)
 	} else {
 		cb("Invalid sprite version identifier. Check the sprite maker api (https://github.com/vigour-io/vigour-spriteMaker/blob/master/README.md#user-content-api) for a list of valid sprite version identifiers.")
 	}
@@ -27,6 +28,7 @@ function createSprite (images, dimensions, resizedSuffix, name, cb) {
 				if (err) {
 					console.log('Error:', err)
 					cb(err)
+					cleanup(resizedImages)
 				} else {
 					nbLeft -= 1
 					if (nbLeft === 0) {
@@ -45,12 +47,14 @@ function buildSprite (images, name, cb) {
 	for (i = 1; i < l; i += 1) {
 		sprite.append(images[i], horizontal)
 	}
-	sprite.write(name + '.png', function (err) {
+	sprite.write(name + '.' + config.spriteFormat, function (err) {
 		if (err) {
 			console.log('Error: ', err)
 			cb(err)
+			cleanup(images)
 		} else {
-			cb(null, name + '.png')
+			cb(null, name + '.' + config.spriteFormat)
+			cleanup(images)
 		}
 	})
 }
