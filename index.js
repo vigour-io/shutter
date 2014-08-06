@@ -74,14 +74,14 @@ function getSprite (req, res, next, items) {
 			res.status(500).end("Error creating temp directory " + tempDirectory, err)
 		} else {
 			for (item in items) {
-				ids.push(items[item].img)
+				ids[items[item].number - 1] = items[item].img
 			}
 			nbLeft = l = ids.length
 			if (l === 0) {
 				res.end(config.invalidRequestMessage)
 			} else {
 				for (i = 0; i < l; i += 1) {
-					id = ids[i]
+					id = ids[i] || 'images/placeholder.jpg'
 					url = urlFromId(id)
 					path = tempDirectory + '/' + ids[i]
 					paths.push(path)
