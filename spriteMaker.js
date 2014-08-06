@@ -2,12 +2,8 @@ var gm = require('gm')
 	, config = require('./config')
 	, cleanup = require('./cleanup')
 
-module.exports = exports = function (images, version, cb) {
-	if (config[version] && config[version].width && config[version].height) {
-		createSprite(images, config[version], '.resized.' + config.spriteFormat, 'sprite', cb)
-	} else {
-		cb("Invalid sprite version identifier. Check the sprite maker api (https://github.com/vigour-io/vigour-spriteMaker/blob/master/README.md#user-content-api) for a list of valid sprite version identifiers.")
-	}
+module.exports = exports = function (images, dimensions, cb) {
+	createSprite(images, dimensions, '.resized.' + config.spriteFormat, 'sprite', cb)
 }
 
 function createSprite (images, dimensions, resizedSuffix, name, cb) {
@@ -15,27 +11,48 @@ function createSprite (images, dimensions, resizedSuffix, name, cb) {
 		, nbLeft = l
 		, i
 		, resizedImages = []
-		, resizedName
+		, continueLoop = true
 
-	for (i = 0; i < l; i += 1) {
-		resizedName = images[i] + resizedSuffix
-		resizedImages[i] = resizedName
-		gm(images[i])
-			.resize(dimensions.width, dimensions.height, '!')
-			.gravity('Center')
-			.crop(dimensions.width, dimensions.height)
-			.write(resizedName, function (err) {
+	for (i = 0; i < l && continueLoop; i += 1) {
+		(function (iter) {
+			gm(images[iter]).size(function (err, originalSize) {
+				var wRatio
+					, hRatio
+					, resizeRatio
+					, resizedName = images[iter] + resizedSuffix
+
 				if (err) {
-					console.log('Error:', err)
+					console.log('Error: ', err)
 					cb(err)
-					cleanup(resizedImages)
 				} else {
-					nbLeft -= 1
-					if (nbLeft === 0) {
-						buildSprite(resizedImages, name, cb)
+					wRatio = dimensions.width / originalSize.width
+					hRatio = dimensions.height / originalSize.height
+					if (wRatio > hRatio) {
+						resizeRatio = wRatio
+					} else {
+						resizeRatio = hRatio
 					}
+
+					resizedImages[iter] = resizedName
+					gm(images[iter])
+						.gravity('Center')
+						.crop(dimensions.width / resizeRatio, dimensions.height / resizeRatio)
+						.resize(dimensions.width, dimensions.height)
+						.write(resizedName, function (err) {
+							if (err) {
+								console.log('Error:', err)
+								cb(err)
+								cleanup(resizedImages)
+							} else {
+								nbLeft -= 1
+								if (nbLeft === 0) {
+									buildSprite(resizedImages, name, cb)
+								}
+							}
+						})
 				}
 			})
+		}(i))
 	}
 }
 

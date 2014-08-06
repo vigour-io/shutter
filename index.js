@@ -14,17 +14,17 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-// app.use(express.compress());
-//max-age on 10min;
-// app.use(express.static("" + __dirname + "/public", { maxAge: 21600000 }));
-app.get('/:country/:lang/shows/:version', function (req, res, next) {
+app.get('/:country/:lang/shows/:width/:height', function (req, res, next) {
 	var p = req.params
 	validateInput(req, res, next, [p.country, p.lang, 'shows'])
 })
 
-// app.get('/:country/:lang/channels/:version', getChannelsSprite)
+app.get('/:country/:lang/channels/:width/:height', function (req, res, next) {
+	var p = req.params
+	validateInput(req, res, next, [p.country, p.lang, 'channels'])
+})
 
-app.get('/:country/:lang/episodes/:showId/:seasonId/:version', function (req, res, next) {
+app.get('/:country/:lang/episodes/:showId/:seasonId/:width/:height', function (req, res, next) {
 	var p = req.params
 	validateInput(req, res, next, [p.country, p.lang, 'shows', p.showId, 'seasons', p.seasonId, 'episodes'])
 })
@@ -82,21 +82,25 @@ function getSprite (req, res, next, items) {
 			download(url, path, function (err) {
 				if (err) {
 					console.log("Can't download " + url, err)
-					res.end(500)
+					res.status(500).end("Error downloading " + url + ": " + err)
 					cleanup(paths)
 				} else {
 					nbLeft -= 1
 					if (nbLeft === 0) {
-						createSprite(paths, req.params.version, function (err, spritePath) {
-							if (err) {
-								console.log("Can't create sprite", err)
-								res.end(500)
-								cleanup(paths)
-							} else {
-								res.sendfile(spritePath)
-								cleanup(paths)
-							}
-						})
+						createSprite(paths
+							, {
+								width: req.params.width
+								, height: req.params.height
+							}, function (err, spritePath) {
+								if (err) {
+									console.log("Can't create sprite", err)
+									res.status(500).end("Error creating sprite: " + err)
+									cleanup(paths)
+								} else {
+									res.sendfile(spritePath)
+									cleanup(paths)
+								}
+							})
 					}
 				}
 			})
