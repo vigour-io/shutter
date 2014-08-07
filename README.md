@@ -31,28 +31,15 @@ The parameters (except for `:width` and `:height`) will be used to dig through t
         ":lang": {
             "shows": {
                 ":showId": {
-                    "id": Number,
-                    "title": String,
                     "img": String,
-                    "tag": String,
-                    "cover": String,
-                    "date": String,
-                    "description": String,
-                    "longDescription": String,
+                    "number": Number,
                     "seasons": {
                         ":seasonId": {
-                            "id": Number,
                             "number": Number,
                             "episodes": {
                                 ":episodeId": {
-                                    "id": Number,
-                                    "title": String,
-                                    "number": Number,
-                                    "date": String,
-                                    "description": String,
-                                    "longDescription": String,
-                                    "img": "String",
-                                    "video": String
+                                    "img": String,
+                                    "number": Number
                                 }
                             }
                         }
@@ -60,7 +47,8 @@ The parameters (except for `:width` and `:height`) will be used to dig through t
                 }
             },
             "channels": {
-
+                "img": String,
+                "number": Number
             }
         }
     }

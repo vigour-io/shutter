@@ -2,11 +2,51 @@ var express = require('express')
 	, http = require('http')
 	, fs = require('fs')
 	, bodyParser = require('body-parser')
+
+	Cloud = require('vigour-js/browser/network/cloud')
+    .inject(require('vigour-js/browser/network/cloud/datacloud'))
+  , Data = require('vigour-js/data')
+
 	, createSprite = require('./spriteMaker')
-	, data = require('./data')
 	, config = require('./config')
 	, cleanup = require('./cleanup')
-	, port = 8080
+
+	, cloud = new Cloud('ws://' + config.cloudHost + ':' + config.cloudPort)
+	, data = new Data(cloud.data.get(config.mtvCloudDataFieldName))
+
+cloud.subscribe({
+	mtvData: {
+		regions: {
+			'Netherlands': {
+				'en': {
+					shows: {
+						$: {
+							img: true
+							, number: true
+							, seasons: {
+								$: {
+									number: true
+									, episodes: {
+										$: {
+											img: true
+											, number: true
+										}
+									}
+								}
+							}
+						}
+					},
+					channels: {
+						$: {
+							img: true
+							, number: true
+						}
+					}
+				}
+			}
+		}
+	}
+})
 
 app = express();
 
@@ -33,11 +73,14 @@ app.get('*', function (req, res, next) {
 	res.end(config.invalidRequestMessage)
 })
 
-app.listen(port);
-console.log('Listening on port ', port);
+data.addListener(function listen() {
+	app.listen(config.port);
+	console.log('Listening on port ', config.port);
+	this.removeListener(listen)
+})
 
 function validateInput (req, res, next, path) {
-	var items = dive(data, path)
+	var items = dive(data.raw, path)
 	if (items) {
 		getSprite(req, res, next, items)
 	} else {
@@ -52,6 +95,7 @@ function dive (obj, path) {
 	for (i = 0; i < l; i += 1) {
 		r = r[path[i]]
 		if (!r) {
+			console.log(path[i] + ' not found')
 			return false
 		}
 	}
@@ -69,9 +113,11 @@ function getSprite (req, res, next, items) {
 			, url
 			, path
 			, paths = []
+			, errMessage
 		if (err) {
-			console.log("Can't create temp directory " + tempDirectory, err)
-			res.status(500).end("Error creating temp directory " + tempDirectory, err)
+			errMessage = "Error creating temp directory " + tempDirectory + ": "
+			console.log(errMessage, err)
+			res.status(500).end(errMessage + err)
 		} else {
 			for (item in items) {
 				ids[items[item].number - 1] = items[item].img
@@ -87,8 +133,9 @@ function getSprite (req, res, next, items) {
 					paths.push(path)
 					download(url, path, function (err) {
 						if (err) {
-							console.log("Can't download " + url, err)
-							res.status(500).end("Error downloading " + url + ": " + err)
+							errMessage = "Error downloading " + url + ": "
+							console.log(errMessage, err)
+							res.status(500).end(errMessage + err)
 							cleanup(tempDirectory)
 						} else {
 							nbLeft -= 1
@@ -100,8 +147,9 @@ function getSprite (req, res, next, items) {
 										, height: req.params.height
 									}, function (err, spritePath) {
 										if (err) {
-											console.log("Can't create sprite", err)
-											res.status(500).end("Error creating sprite: " + err)
+											errMessage = "Error creating sprite: "
+											console.log(errMessage, err)
+											res.status(500).end(errMessage + err)
 											cleanup(tempDirectory)
 										} else {
 											res.sendfile(spritePath)
