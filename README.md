@@ -1,4 +1,4 @@
-vigour-spriteMaker
+vigour-img
 ==================
 
 Makes a sprite out of an array of urls
