@@ -22,7 +22,7 @@ subscribeObj[config.mtvCloudDataFieldName] =  {
 		// $: {
 		// 	$: {
 		'Netherlands': { // Only use Netherlands until the cloud can support more
-			'en': {	// Only use en until the cloud can support more
+			$: {	// Only use en until the cloud can support more
 				shows: {
 					$: {
 						img: true
@@ -169,7 +169,7 @@ function getSprite (req, res, next, items) {
 						path = tmpDir + '/' + ids[i]
 					} else {
 						url = false
-						path = 'images/placeholder.jpg'
+						path = 'images/mtv_logo_placeholder.png'
 					}
 					paths.push(path)
 					if (url) {
@@ -203,12 +203,13 @@ function getSprite (req, res, next, items) {
 }
 
 function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
+	var spritePath
 	if (nbLeft === 0) {
-		imgManip.makeSprite(paths
+		spritePath = config.spriteName + '.' + config.spriteFormat
+		imgManip.sprite(paths
 			, desiredDimensions
-			, tmpDir
-			, config.spriteName + '.' + config.spriteFormat
-			, function (err, spritePath) {
+			, spritePath
+			, function (err) {
 				var errMessage
 				if (err) {
 					errMessage = "Error creating sprite: "
