@@ -1,52 +1,57 @@
 var express = require('express')
 	, http = require('http')
-	, fs = require('fs')
 	, bodyParser = require('body-parser')
+	, fs = require('fs')
+
 
 	Cloud = require('vigour-js/browser/network/cloud')
     .inject(require('vigour-js/browser/network/cloud/datacloud'))
   , Data = require('vigour-js/data')
 
-	, createSprite = require('./spriteMaker')
 	, config = require('./config')
+	, imgManip = require('./imgManip')
 	, cleanup = require('./cleanup')
 
 	, cloud = new Cloud('ws://' + config.cloudHost + ':' + config.cloudPort)
 	, data = new Data(cloud.data.get(config.mtvCloudDataFieldName))
 
-cloud.subscribe({
-	mtvData: {
-		regions: {
-			'Netherlands': {
-				'en': {
-					shows: {
-						$: {
-							img: true
-							, number: true
-							, seasons: {
-								$: {
-									number: true
-									, episodes: {
-										$: {
-											img: true
-											, number: true
-										}
+	, subscribeObj = {}
+
+subscribeObj[config.mtvCloudDataFieldName] =  {
+	// regions: {
+		// $: {
+		// 	$: {
+		'Netherlands': { // Only use Netherlands until the cloud can support more
+			'en': {	// Only use en until the cloud can support more
+				shows: {
+					$: {
+						img: true
+						, number: true
+						, seasons: {
+							$: {
+								number: true
+								, episodes: {
+									$: {
+										img: true
+										, number: true
 									}
 								}
 							}
 						}
-					},
-					channels: {
-						$: {
-							img: true
-							, number: true
-						}
+					}
+				},
+				channels: {
+					$: {
+						img: true
+						, number: true
 					}
 				}
 			}
 		}
-	}
-})
+	// }
+}
+
+cloud.subscribe(subscribeObj)
 
 app = express();
 
@@ -54,37 +59,64 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-app.get('/:country/:lang/shows/:width/:height', function (req, res, next) {
-	var p = req.params
-	validateInput(req, res, next, [p.country, p.lang, 'shows'])
-})
+app.get('/sprite/:country/:lang/shows/:width/:height'
+	, function (req, res, next) {
+		var p = req.params
+		requestSprite(req
+			, res
+			, next
+			, [p.country
+				, p.lang
+				, 'shows'
+			])
+	})
 
-app.get('/:country/:lang/channels/:width/:height', function (req, res, next) {
-	var p = req.params
-	validateInput(req, res, next, [p.country, p.lang, 'channels'])
-})
+// app.get('/sprite/:country/:lang/channels/:width/:height'
+// 	, function (req, res, next) {
+// 		var p = req.params
+// 		requestSprite(req
+// 			, res
+// 			, next
+// 			, [p.country
+// 				, p.lang
+// 				, 'channels'
+// 			])
+// 	})
 
-app.get('/:country/:lang/episodes/:showId/:seasonId/:width/:height', function (req, res, next) {
-	var p = req.params
-	validateInput(req, res, next, [p.country, p.lang, 'shows', p.showId, 'seasons', p.seasonId, 'episodes'])
-})
+app.get('/sprite/:country/:lang/episodes/:showId/:seasonId/:width/:height'
+	, function (req, res, next) {
+		var p = req.params
+		requestSprite(req
+			, res
+			, next
+			, [p.country
+				, p.lang
+				, 'shows'
+				, p.showId
+				, 'seasons'
+				, p.seasonId
+				, 'episodes'
+			])
+	})
 
-app.get('*', function (req, res, next) {
-	res.end(config.invalidRequestMessage)
-})
+app.get('*'
+	, function (req, res, next) {
+		res.status(400).end(config.invalidRequestMessage)
+	})
 
-data.addListener(function listen() {
+
+data.addListener(function listen () {
 	app.listen(config.port);
 	console.log('Listening on port ', config.port);
 	this.removeListener(listen)
 })
 
-function validateInput (req, res, next, path) {
+function requestSprite (req, res, next, path) {
 	var items = dive(data.raw, path)
 	if (items) {
 		getSprite(req, res, next, items)
 	} else {
-		res.end(config.invalidRequestMessage)
+		res.status(400).end(config.invalidRequestMessage)
 	}
 }
 
@@ -103,8 +135,12 @@ function dive (obj, path) {
 }
 
 function getSprite (req, res, next, items) {
-	var tempDirectory = config.tempDirectory + '/' + Math.random().toString().slice(1)
-	fs.mkdir(tempDirectory, function (err) {
+	var tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
+		, desiredDimensions = {
+			width: req.params.width
+			, height: req.params.height
+		}
+	fs.mkdir(tmpDir, function (err) {
 		var ids = []
 			, l
 			, i
@@ -115,7 +151,7 @@ function getSprite (req, res, next, items) {
 			, paths = []
 			, errMessage
 		if (err) {
-			errMessage = "Error creating temp directory " + tempDirectory + ": "
+			errMessage = "Error creating temp directory " + tmpDir + ": "
 			console.log(errMessage, err)
 			res.status(500).end(errMessage + err)
 		} else {
@@ -124,45 +160,67 @@ function getSprite (req, res, next, items) {
 			}
 			nbLeft = l = ids.length
 			if (l === 0) {
-				res.end(config.invalidRequestMessage)
+				res.status(400).end(config.invalidRequestMessage)
 			} else {
 				for (i = 0; i < l; i += 1) {
-					id = ids[i] || 'images/placeholder.jpg'
-					url = urlFromId(id)
-					path = tempDirectory + '/' + ids[i]
+					if (ids[i]) {
+						id = ids[i]
+						url = urlFromId(id)
+						path = tmpDir + '/' + ids[i]
+					} else {
+						url = false
+						path = 'images/placeholder.jpg'
+					}
 					paths.push(path)
-					download(url, path, function (err) {
-						if (err) {
-							errMessage = "Error downloading " + url + ": "
-							console.log(errMessage, err)
-							res.status(500).end(errMessage + err)
-							cleanup(tempDirectory)
-						} else {
-							nbLeft -= 1
-							if (nbLeft === 0) {
-								createSprite(tempDirectory
+					if (url) {
+						download(url, path, function (err) {
+							if (err) {
+								errMessage = "Error downloading " + url + ": "
+								console.log(errMessage, err)
+								res.status(500).end(errMessage + err)
+								cleanup(tmpDir)
+							} else {
+								nbLeft -= 1
+								getSpriteIfReady(nbLeft
 									, paths
-									, {
-										width: req.params.width
-										, height: req.params.height
-									}, function (err, spritePath) {
-										if (err) {
-											errMessage = "Error creating sprite: "
-											console.log(errMessage, err)
-											res.status(500).end(errMessage + err)
-											cleanup(tempDirectory)
-										} else {
-											res.sendfile(spritePath)
-											cleanup(tempDirectory)
-										}
-									})
+									, desiredDimensions
+									, tmpDir
+									, res)
 							}
-						}
-					})
+						})
+					} else {
+						nbLeft -= 1
+						getSpriteIfReady(nbLeft
+							, paths
+							, desiredDimensions
+							, tmpDir
+							, res)
+					}
 				}
 			}
 		}
 	})
+}
+
+function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
+	if (nbLeft === 0) {
+		imgManip.makeSprite(paths
+			, desiredDimensions
+			, tmpDir
+			, config.spriteName + '.' + config.spriteFormat
+			, function (err, spritePath) {
+				var errMessage
+				if (err) {
+					errMessage = "Error creating sprite: "
+					console.log(errMessage, err)
+					res.status(500).end(errMessage + err)
+					cleanup(tmpDir)
+				} else {
+					res.sendfile(spritePath)
+					cleanup(tmpDir)
+				}
+			})
+	}
 }
 
 function urlFromId (id) {
