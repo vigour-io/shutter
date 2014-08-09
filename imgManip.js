@@ -30,7 +30,7 @@ module.exports = exports = {
 			+ " '" + out + "'"
 			, cb)
 	}
-	, mask: function (subject, dimensions, mask, color, out, cb) {
+	, mask: function (subject, mask, color, dimensions, out, cb) {
 		var dimensionsString = dimensions.width + "x" + dimensions.height
 		execCommand("/usr/local/opt/imagemagick/bin/convert -size '" + dimensionsString + "'"
 			+ " xc:'" + color + "'"
@@ -51,7 +51,7 @@ module.exports = exports = {
 			+ " '" + out + "'"
 			, cb)
 	}
-	, transparentMask: function (subject, dimensions, mask, out, cb) {
+	, transparentMask: function (subject, mask, dimensions, out, cb) {
 		var dimensionsString = dimensions.width + "x" + dimensions.height
 		execCommand("/usr/local/opt/imagemagick/bin/convert"
 			+ " \\( '" + subject + "'"
@@ -77,6 +77,20 @@ module.exports = exports = {
 			+ " -composite"
 			+ " '" + out + "'"
 			, cb)
+	}
+	, compositeOverlay: function (subject, overlay, dimensions, out, cb) {
+		var dimensionsString = dimensions.width + "x" + dimensions.height
+		execCommand("/usr/local/opt/imagemagick/bin/convert"
+			+ " \\( '" + subject + "'"
+			+ " -resize '" + dimensionsString + "^'"
+			+ " -gravity 'Center'"
+			+ " -crop '" + dimensionsString + "+0+0' \\)"
+			+ " \\( '" + overlay + "'"
+			+ " -resize '" + dimensionsString + "!'"
+			+ " -gravity 'Center' \\)"
+			+ " -compose 'CopyOpacity' -composite"
+			+ " '" + out + "'"
+			, cb)	
 	}
 	, sprite: function (images, dimensions, out, cb) {
 		var dimensionsString = dimensions.width + "x" + dimensions.height

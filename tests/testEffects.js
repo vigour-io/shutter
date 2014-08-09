@@ -5,6 +5,7 @@ var imgManip = require('../imgManip')
 	, logoMask = '../images/logo_mask.png'
 	, avatarMask = '../images/avatar_mask.png'
 	, overlay = 'gradient.png'
+	, compositeOverlay = 'diagonalGradient.png'
 	, dimensions = { width: 370, height: 210 }
 
 imgManip.smartResize(subject
@@ -31,9 +32,9 @@ imgManip.darken(subject
 	})
 
 imgManip.mask(subject
-	, dimensions
 	, logoMask
 	, '#EE255C'
+	, dimensions
 	, outDir + '/masked.png'
 	, function (err) {
 		if (err) {
@@ -44,8 +45,8 @@ imgManip.mask(subject
 	})
 
 imgManip.transparentMask(subject
-	, dimensions
 	, logoMask
+	, dimensions
 	, outDir + '/transparentMasked.png'
 	, function (err) {
 		if (err) {
@@ -67,9 +68,21 @@ imgManip.overlay(subject
 		}
 	})
 
+imgManip.compositeOverlay(subject
+	, compositeOverlay
+	, dimensions
+	, outDir + '/compositeOverlaid.png'
+	, function (err) {
+		if (err) {
+			console.log('composite overlay error', err)
+		} else {
+			console.log('composite overlay done')
+		}
+	})
+
 imgManip.transparentMask(subject
-	, { width: 150, height: 150 }
 	, avatarMask
+	, { width: 150, height: 150 }
 	, outDir + '/avatarMasked.png'
 	, function (err) {
 		if (err) {
