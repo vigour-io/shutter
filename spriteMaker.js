@@ -10,58 +10,73 @@ module.exports = exports = {
 	requestSprite: function (req, res, next) {
 		var items = dive(data.raw, req.pathToSpriteData)
 		if (items) {
-			getSprite(req, res, next, items)
+			getSprite(req, res, items)
 		} else {
 			res.status(400).end(config.invalidRequestMessage)
 		}
 	}
 }
 
-function getSprite (req, res, next, items) {
+function getSprite (req, res, items) {
 	var tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
 		, desiredDimensions = {
 			width: req.params.width
 			, height: req.params.height
 		}
-	fs.mkdir(tmpDir, function (err) {
-		var ids = []
-			, l
-			, i
-			, nbLeft
-			, id
-			, url
-			, path
-			, paths = []
-			, errMessage
+	prepare(function (err) {
 		if (err) {
-			errMessage = "Error creating temp directory " + tmpDir + ": "
+			errMessage = "Error creating temp directory " + config.tmpDir + ": "
 			console.log(errMessage, err)
 			res.status(500).end(errMessage + err)
 		} else {
-			for (item in items) {
-				ids[items[item].number - 1] = items[item].img
-			}
-			nbLeft = l = ids.length
-			if (l === 0) {
-				res.status(400).end(config.invalidRequestMessage)
-			} else {
-				for (i = 0; i < l; i += 1) {
-					if (ids[i]) {
-						id = ids[i]
-						url = urlFromId(id)
-						path = tmpDir + '/' + ids[i]
-					} else {
-						url = false
-						path = 'images/mtv_logo_placeholder.png'
+			fs.mkdir(tmpDir, function (err) {
+				var ids = []
+					, l
+					, i
+					, nbLeft
+					, id
+					, url
+					, path
+					, paths = []
+					, errMessage
+				if (err) {
+					errMessage = "Error creating temp directory " + tmpDir + ": "
+					console.log(errMessage, err)
+					res.status(500).end(errMessage + err)
+				} else {
+					for (item in items) {
+						ids[items[item].number - 1] = items[item].img
 					}
-					paths.push(path)
-					if (url) {
-						download(url, path, function (err) {
-							if (err) {
-								errMessage = "Error downloading " + url + ": "
-								console.log(errMessage, err)
-								res.status(500).end(errMessage + err)
-								cleanup(tmpDir)
+					nbLeft = l = ids.length
+					if (l === 0) {
+						res.status(400).end(config.invalidRequestMessage)
+					} else {
+						for (i = 0; i < l; i += 1) {
+							if (ids[i]) {
+								id = ids[i]
+								url = urlFromId(id)
+								path = tmpDir + '/' + ids[i]
+							} else {
+								url = false
+								path = 'images/mtv_logo_placeholder.png'
+							}
+							paths.push(path)
+							if (url) {
+								download(url, path, function (err) {
+									if (err) {
+										errMessage = "Error downloading " + url + ": "
+										console.log(errMessage, err)
+										res.status(500).end(errMessage + err)
+										cleanup(tmpDir)
+									} else {
+										nbLeft -= 1
+										getSpriteIfReady(nbLeft
+											, paths
+											, desiredDimensions
+											, tmpDir
+											, res)
+									}
+								})
 							} else {
 								nbLeft -= 1
 								getSpriteIfReady(nbLeft
@@ -70,17 +85,26 @@ function getSprite (req, res, next, items) {
 									, tmpDir
 									, res)
 							}
-						})
-					} else {
-						nbLeft -= 1
-						getSpriteIfReady(nbLeft
-							, paths
-							, desiredDimensions
-							, tmpDir
-							, res)
+						}
 					}
 				}
-			}
+			})
+		}
+	})
+}
+
+function prepare (cb) {
+	fs.exists(config.tmpDir, function (exists) {
+		if (exists) {
+			cb(null)
+		} else {
+			fs.mkdir(config.tmpDir, function (err) {
+				if (err) {
+					cb(err)
+				} else {
+					cb(null)
+				}
+			})
 		}
 	})
 }
