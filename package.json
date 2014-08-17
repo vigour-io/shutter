@@ -8,7 +8,7 @@
   },
   "main": "./index.js",
   "scripts": {
-    "start": "sudo supervisor --ignore README.md,LICENSE,.gitignore,.DS_Store,package.json,todo,tmp index.js"
+    "start": "sudo supervisor --ignore README.md,LICENSE,.gitignore,.DS_Store,package.json,tmp index.js"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -23,6 +23,7 @@
     "express": "^4.7.4",
     "gm": "^1.16.0",
     "rimraf": "^2.2.8",
+    "supervisor": "^0.6.0",
     "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
     "ws": "^0.4.32"
   },
