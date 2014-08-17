@@ -92,7 +92,38 @@ module.exports = exports = {
 			+ " '" + out + "'"
 			, cb)	
 	}
-	, sprite: function (images, dimensions, out, cb) {
+	, sprite: function (images, dimensions, tmpDir, spriteName, spriteFormat, maxCols, cb) {
+		var l = images.length
+			, nbLeft = Math.ceil(l / maxCols)
+			, i
+			, subSprites = []
+			, stop = false
+			, spritePath = tmpDir + '/' + spriteName + '.' + spriteFormat
+			, subSpritePath
+		if (l > maxCols) {
+			for (i = 0; i < l && !stop; i += maxCols) {
+				subSpritePath = tmpDir + '/' + spriteName + i + '.' + spriteFormat
+				subSprites.push(subSpritePath)
+				exports.subSprite(images.slice(i, i + maxCols)
+					, dimensions
+					, subSpritePath
+					, function (err) {
+						if (err) {
+							stop = true
+							cb(err)
+						} else {
+							nbLeft -= 1
+							if (nbLeft === 0) {
+								exports.assembleSprites(subSprites, spritePath, cb)
+							}
+						}
+					})
+			}
+		} else {
+			exports.subSprite(images, dimensions, spritePath, cb)
+		}
+	}
+	, subSprite: function (images, dimensions, out, cb) {
 		var dimensionsString = dimensions.width + "x" + dimensions.height
 			, imagesString = "'" + images.join("' '") + "'"
 		execCommand("gm convert " + imagesString
@@ -100,6 +131,13 @@ module.exports = exports = {
 			+ " -gravity 'Center'"
 			+ " -crop '" + dimensionsString + "+0+0'"
 			+ " +append"
+			+ " '" + out + "'"
+			, cb)
+	}
+	, assembleSprites: function (images, out, cb) {
+		var imagesString = "'" + images.join("' '") + "'"
+		execCommand("gm convert " + imagesString
+			+ " -append"
 			+ " '" + out + "'"
 			, cb)
 	}

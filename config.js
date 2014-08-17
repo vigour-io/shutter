@@ -2,6 +2,7 @@ module.exports = exports = {
 	spriteName: 'sprite'
 	, spriteFormat: 'jpg'
 	, tmpDir: 'tmp'
+	, maxCols: 10
 
 	, invalidRequestMessage: "Invalid request. Make sure you are respecting the sprite maker api (https://github.com/vigour-io/vigour-img/blob/master/README.md#user-content-api) and that the requested data exists."
 

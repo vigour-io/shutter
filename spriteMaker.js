@@ -110,12 +110,13 @@ function prepare (cb) {
 }
 
 function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
-	var spritePath
 	if (nbLeft === 0) {
-		spritePath = config.spriteName + '.' + config.spriteFormat
 		imgManip.sprite(paths
 			, desiredDimensions
-			, spritePath
+			, tmpDir
+			, config.spriteName
+			, config.spriteFormat
+			, config.maxCols
 			, function (err) {
 				var errMessage
 				if (err) {
@@ -124,8 +125,12 @@ function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
 					res.status(500).end(errMessage + err)
 					cleanup(tmpDir)
 				} else {
-					res.sendfile(spritePath)
-					cleanup(tmpDir)
+					res.sendfile(tmpDir + '/' + config.spriteName + '.' + config.spriteFormat, function (err) {
+						if (err) {
+							console.error(err)
+						}
+						cleanup(tmpDir)
+					})
 				}
 			})
 	}
