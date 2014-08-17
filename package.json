@@ -1,28 +1,29 @@
 {
-  "name": "vigour-spriteMaker",
-  "version": "0.0.0",
+  "name": "vigour-img",
+  "version": "0.0.1",
   "author": "Vigour.io <dev@vigour.io>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vigour-io/vigour-spriteMaker.git"
+    "url": "https://github.com/vigour-io/vigour-img.git"
   },
   "main": "./index.js",
   "scripts": {
-    "start": "sudo supervisor --ignore README.md,LICENSE,.gitignore,.DS_Store,package.json,todo,tmp index.js"
+    "start": "sudo supervisor --ignore README.md,LICENSE,.gitignore,.DS_Store,package.json,tmp index.js"
   },
   "engines": {
     "node": ">=0.10.0"
   },
   "description": "Makes a sprite out of an array of urls",
   "bugs": {
-    "url": "https://github.com/vigour-io/vigour-spriteMaker/issues"
+    "url": "https://github.com/vigour-io/vigour-img/issues"
   },
-  "homepage": "https://github.com/vigour-io/vigour-spriteMaker",
+  "homepage": "https://github.com/vigour-io/vigour-img",
   "dependencies": {
     "body-parser": "^1.5.2",
     "express": "^4.7.4",
     "gm": "^1.16.0",
     "rimraf": "^2.2.8",
+    "supervisor": "^0.6.0",
     "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
     "ws": "^0.4.32"
   },
