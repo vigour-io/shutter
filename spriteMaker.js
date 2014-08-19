@@ -1,5 +1,4 @@
-var fs = require('fs')
-	, http = require('http')
+var fs = require('vigour-fs')
 
 	, imgManip = require('./imgManip')
 	, cleanup = require('./cleanup')
@@ -25,8 +24,8 @@ function getSprite (req, res, items) {
 		}
 	prepare(function (err) {
 		if (err) {
-			errMessage = "Error creating temp directory " + config.tmpDir + ": "
-			console.log(errMessage, err)
+			errMessage = "\nError creating temp directory " + config.tmpDir + ": "
+			console.error(errMessage, err)
 			res.status(500).end(errMessage + err)
 		} else {
 			fs.mkdir(tmpDir, function (err) {
@@ -40,8 +39,8 @@ function getSprite (req, res, items) {
 					, paths = []
 					, errMessage
 				if (err) {
-					errMessage = "Error creating temp directory " + tmpDir + ": "
-					console.log(errMessage, err)
+					errMessage = "\nError creating temp directory " + tmpDir + ": "
+					console.error(errMessage, err)
 					res.status(500).end(errMessage + err)
 				} else {
 					for (item in items) {
@@ -62,21 +61,25 @@ function getSprite (req, res, items) {
 							}
 							paths.push(path)
 							if (url) {
-								download(url, path, function (err) {
-									if (err) {
-										errMessage = "Error downloading " + url + ": "
-										console.log(errMessage, err)
-										res.status(500).end(errMessage + err)
-										cleanup(tmpDir)
-									} else {
-										nbLeft -= 1
-										getSpriteIfReady(nbLeft
-											, paths
-											, desiredDimensions
-											, tmpDir
-											, res)
+								fs.writeFile(path, url, {
+										maxTries: config.maxTries
+								    , retryOn404: true	// MTV sometimes responds with 404 even when retries work
 									}
-								})
+									, function (err) {
+										if (err) {
+											errMessage = "\nDownload error (" + url + "). "
+											console.error(errMessage, err)
+											res.status(500).end(errMessage + err)
+											cleanup(tmpDir)
+										} else {
+											nbLeft -= 1
+											getSpriteIfReady(nbLeft
+												, paths
+												, desiredDimensions
+												, tmpDir
+												, res)
+										}
+									})
 							} else {
 								nbLeft -= 1
 								getSpriteIfReady(nbLeft
@@ -94,7 +97,7 @@ function getSprite (req, res, items) {
 }
 
 function prepare (cb) {
-	fs.exists(config.tmpDir, function (exists) {
+	fs.exists(config.tmpDir, function (exists) {	// Remove call to exists. Just call mkdir and ignore error due to directory already existing
 		if (exists) {
 			cb(null)
 		} else {
@@ -120,17 +123,22 @@ function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
 			, function (err) {
 				var errMessage
 				if (err) {
-					errMessage = "Error creating sprite: "
-					console.log(errMessage, err)
+					errMessage = "\nError creating sprite: "
+					console.error(errMessage, err)
 					res.status(500).end(errMessage + err)
 					cleanup(tmpDir)
 				} else {
-					res.sendfile(tmpDir + '/' + config.spriteName + '.' + config.spriteFormat, function (err) {
-						if (err) {
-							console.error(err)
+					res.sendFile(tmpDir + '/' + config.spriteName + '.' + config.spriteFormat
+						, {
+							root: __dirname
+							// , dotfiles: 'allow'
 						}
-						cleanup(tmpDir)
-					})
+						, function (err) {
+							if (err) {
+								console.error(err)
+							}
+							cleanup(tmpDir)
+						})
 				}
 			})
 	}
@@ -140,19 +148,6 @@ function urlFromId (id) {
 	return 'http://images.mtvnn.com/' + id + '/306x172'
 }
 
-function download (url, dest, cb) {
-	var file = fs.createWriteStream(dest)
-		, request = http.get(url, function (response) {
-			response.pipe(file)
-			file.on('finish', function () {
-				file.close(cb)
-			})
-		}).on('error', function (err) {
-			fs.unlink(dest)
-			cb(err.message)
-		})
-}
-
 function dive (obj, path) {
 	var r = obj
 		, l = path.length
@@ -160,7 +155,7 @@ function dive (obj, path) {
 	for (i = 0; i < l; i += 1) {
 		r = r[path[i]]
 		if (!r) {
-			console.log(path[i] + ' not found')
+			console.error(path[i] + ' not found')
 			return false
 		}
 	}

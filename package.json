@@ -25,6 +25,7 @@
     "rimraf": "^2.2.8",
     "supervisor": "^0.6.0",
     "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
+    "vigour-fs": "git+ssh://git@github.com:vigour-io/vigour-fs.git#master",
     "ws": "^0.4.32"
   },
   "devDependencies": {},

@@ -7,7 +7,7 @@ Makes a sprite out of an array of urls
 ImageMagick `brew install ImageMagick`
 
 <a name='api'></a>
-## API (Usage)
+## Usage
 - Start the server (`npm start`)
 - Issue a GET request to one of the following addresses to obtain the sprite corresponding to the provided parameters.
     + `/sprite/:country/:lang/shows/:width/:height`
@@ -54,3 +54,9 @@ The parameters (except for `:width` and `:height`) will be used to dig through t
     }
 }
 ```
+
+### Known issues
+```
+Error creating sprite: Error: Command failed: gm convert: No decode delegate for this image format (tmp/<temporary_directory_name>/<image_id>).
+```
+If you get this error when requesting a sprite, trying again often works. If not, make sure the data is correct (the provided image ids should correspond to existing images at `http://images.mtvnn.com/<image_id>/306x172`)
