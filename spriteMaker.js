@@ -145,7 +145,7 @@ function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
 }
 
 function urlFromId (id) {
-	return 'http://images.mtvnn.com/' + id + '/306x172'
+	return 'http://images.mtvnn.com/' + id + '/original'
 }
 
 function dive (obj, path) {
