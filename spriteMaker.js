@@ -2,6 +2,7 @@ var fs = require('vigour-fs')
 
 	, imgManip = require('./imgManip')
 	, cleanup = require('./cleanup')
+	, util = require('./util')
 
 	, config = require('./config')
 
@@ -128,6 +129,9 @@ function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
 					res.status(500).end(errMessage + err)
 					cleanup(tmpDir)
 				} else {
+					res.set("Cache-Control", "public")
+					res.set("Last-Modified", util.httpDate(Date.now()))
+					res.set("Expires", util.httpDate(Date.now() + 10 * 60 * 1000))
 					res.sendFile(tmpDir + '/' + config.spriteName + '.' + config.spriteFormat
 						, {
 							root: __dirname
