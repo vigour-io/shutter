@@ -1,7 +1,6 @@
 var fs = require('vigour-fs')
 
 	, imgManip = require('./imgManip')
-	, cleanup = require('./cleanup')
 	, util = require('./util')
 
 	, config = require('./config')
@@ -23,7 +22,7 @@ function getSprite (req, res, items) {
 			width: req.params.width
 			, height: req.params.height
 		}
-	prepare(function (err) {
+	util.prepare(function (err) {
 		if (err) {
 			errMessage = "\nError creating temp directory " + config.tmpDir + ": "
 			console.error(errMessage, err)
@@ -54,7 +53,7 @@ function getSprite (req, res, items) {
 						for (i = 0; i < l; i += 1) {
 							if (ids[i]) {
 								id = ids[i]
-								url = urlFromId(id)
+								url = util.urlFromId(id)
 								path = tmpDir + '/' + ids[i]
 							} else {
 								url = false
@@ -71,7 +70,7 @@ function getSprite (req, res, items) {
 											errMessage = "\nDownload error (" + url + "). "
 											console.error(errMessage, err)
 											res.status(500).end(errMessage + err)
-											cleanup(tmpDir)
+											util.cleanup(tmpDir)
 										} else {
 											nbLeft -= 1
 											getSpriteIfReady(nbLeft
@@ -97,29 +96,12 @@ function getSprite (req, res, items) {
 	})
 }
 
-function prepare (cb) {
-	fs.exists(config.tmpDir, function (exists) {	// Remove call to exists. Just call mkdir and ignore error due to directory already existing
-		if (exists) {
-			cb(null)
-		} else {
-			fs.mkdir(config.tmpDir, function (err) {
-				if (err) {
-					cb(err)
-				} else {
-					cb(null)
-				}
-			})
-		}
-	})
-}
-
 function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
 	if (nbLeft === 0) {
 		imgManip.sprite(paths
 			, desiredDimensions
 			, tmpDir
 			, config.spriteName
-			, config.spriteFormat
 			, config.maxCols
 			, function (err) {
 				var errMessage
@@ -127,12 +109,11 @@ function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
 					errMessage = "\nError creating sprite: "
 					console.error(errMessage, err)
 					res.status(500).end(errMessage + err)
-					cleanup(tmpDir)
+					util.cleanup(tmpDir)
 				} else {
-					res.set("Cache-Control", "public")
-					res.set("Last-Modified", util.httpDate(Date.now()))
-					res.set("Expires", util.httpDate(Date.now() + 10 * 60 * 1000))
-					res.sendFile(tmpDir + '/' + config.spriteName + '.' + config.spriteFormat
+					util.setHeaders(res)
+
+					res.sendFile(tmpDir + '/' + config.spriteName + '.jpg'
 						, {
 							root: __dirname
 							// , dotfiles: 'allow'
@@ -141,15 +122,11 @@ function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
 							if (err) {
 								console.error(err)
 							}
-							cleanup(tmpDir)
+							util.cleanup(tmpDir)
 						})
 				}
 			})
 	}
-}
-
-function urlFromId (id) {
-	return 'http://images.mtvnn.com/' + id + '/original'
 }
 
 function dive (obj, path) {

@@ -22,10 +22,11 @@
     "body-parser": "^1.5.2",
     "express": "^4.7.4",
     "gm": "^1.16.0",
+    "npmlog": "^0.1.1",
     "rimraf": "^2.2.8",
     "supervisor": "^0.6.0",
-    "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
     "vigour-fs": "git+ssh://git@github.com:vigour-io/vigour-fs.git#master",
+    "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
     "ws": "^0.4.32"
   },
   "devDependencies": {},

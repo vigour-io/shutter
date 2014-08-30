@@ -1,7 +1,7 @@
 module.exports = exports = {
 	spriteName: 'sprite'
-	, spriteFormat: 'jpg'
 	, tmpDir: 'tmp'
+	, outDir: 'out'
 	, maxCols: 10
 
 	, maxTries: 6
