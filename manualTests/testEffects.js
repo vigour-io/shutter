@@ -8,7 +8,8 @@ var imgManip = require('../imgManip')
 	, compositeOverlay = 'diagonalGradient.png'
 	, dimensions = { width: 370, height: 210 }
 
-imgManip.smartResize(subject
+imgManip.effect({}
+	, subject
 	, dimensions
 	, outDir + '/resized'
 	, function (err, path){
@@ -19,21 +20,26 @@ imgManip.smartResize(subject
 	  }
 	})
 
-imgManip.darken(subject
-	, '#171717'
-	, '60'
-	, outDir + '/darkened'
-	, function (err, path) {
-		if (err) {
-			console.log('darken error', err)
-		} else {
-	  	console.log('darken done', path)
-	  }
-	})
+// imgManip.darken(subject
+// 	, '#171717'
+// 	, '60'
+// 	, outDir + '/darkened'
+// 	, function (err, path) {
+// 		if (err) {
+// 			console.log('darken error', err)
+// 		} else {
+// 	  	console.log('darken done', path)
+// 	  }
+// 	})
 
-imgManip.mask(subject
-	, logoMask
-	, '#EE255C'
+
+
+imgManip.effect({
+		effect: 'mask'
+		, mask: 'logoMask'
+		, fillColor: 'EE255C'
+	}
+	, subject
 	, dimensions
 	, outDir + '/masked'
 	, function (err, path) {
@@ -44,8 +50,11 @@ imgManip.mask(subject
 	  }
 	})
 
-imgManip.transparentMask(subject
-	, logoMask
+imgManip.effect({
+		effect: 'tMask'
+		, mask: 'logoMask'
+	}
+	, subject
 	, dimensions
 	, outDir + '/transparentMasked'
 	, function (err, path) {
@@ -56,8 +65,11 @@ imgManip.transparentMask(subject
 	  }
 	})
 
-imgManip.overlay(subject
-	, overlay
+imgManip.effect({
+		effect: 'overlay'
+		, overlay: 'overlay'
+	}
+	, subject
 	, dimensions
 	, outDir + '/overlaid'
 	, function (err, path) {
@@ -68,8 +80,11 @@ imgManip.overlay(subject
 		}
 	})
 
-imgManip.compositeOverlay(subject
-	, compositeOverlay
+imgManip.effect({
+		effect: 'composite'
+		, overlay: 'overlay'
+	}
+	, subject
 	, dimensions
 	, outDir + '/compositeOverlaid'
 	, function (err, path) {
@@ -80,22 +95,13 @@ imgManip.compositeOverlay(subject
 		}
 	})
 
-imgManip.transparentMask(subject
-	, avatarMask
-	, { width: 150, height: 150 }
-	, outDir + '/avatarMasked'
-	, function (err, path) {
-		if (err) {
-			console.log('avatar mask error', err)
-		} else {
-	  	console.log('avatar mask done', path)
-	  }
-	})
-
-imgManip.effect('avatar'
+imgManip.effect({
+		effect: 'tMask'
+		, mask: 'avatarMask'
+	}
 	, subject
 	, { width: 150, height: 150 }
-	, outDir + '/avatarEffect'
+	, outDir + '/avatar'
 	, function (err, path) {
 		if (err) {
 			console.log('avatar effect error', err)

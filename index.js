@@ -60,10 +60,10 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-app.get('/image/:id/:width/:height/:effect?'
+app.get('/image/:id/:width/:height'
 	, function (req, res, next) {
 		var tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
-			, out = config.outDir + '/' + util.escapeSlashes(req.originalUrl)
+			, out = config.outDir + '/' + encodeURIComponent(req.originalUrl)
 			, desiredDimensions = {
 				width: req.params.width
 				, height: req.params.height
@@ -115,7 +115,7 @@ app.get('/image/:id/:width/:height/:effect?'
 					res.status(500).end(err.toString())
 					util.cleanup(tmpDir)
 				} else {
-					imgManip.effect(req.params.effect
+					imgManip.effect(req.query
 						, path
 						, desiredDimensions
 						, out

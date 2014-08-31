@@ -9,9 +9,23 @@ ImageMagick `brew install ImageMagick`
 <a name='api'></a>
 ## Usage
 - Start the server (`npm start`)
-- Issue a GET request to one of the following addresses to obtain the sprite corresponding to the provided parameters.
+- Issue a GET request to one of the following addresses to obtain the sprite corresponding to the provided parameters
     + `/sprite/:country/:lang/shows/:width/:height`
     + `/sprite/:country/:lang/episodes/:showId/:seasonId/:width/:height`
+- Issue a GET request to the following address to obtain a single image corresponding to the parameters provided in the route and the query string. 
+    + `/image/:id/:width/:height`, examples:
+        * `/image/55f50432fd73e366c69956ad3cb97a59/150/150?effect=tMask&mask=avatarMask`
+        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=composite&overlay=overlay`
+        * `http://localhost/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=mask&mask=logoMask&fillColor=EE255C`
+        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=overlay&overlay=overlay`
+        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210` (equivalent to `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=smartResize`)
+        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=tMask&mask=logoMask`
+    + Check `vigour-img/images/` for available masks and overlays
+
+queryString | options | result
+---|---|---
+smartResize | | Image is resized to the specified dimensions, conserving aspect ratios by cropping around the center. Option is ignored
+mask | *image name* | 
 
 ### Parameters
 - `:country` A full country name, like **Germany**

@@ -2,10 +2,6 @@ var rimraf = require('rimraf')
 
 module.exports = exports = {}
 
-exports.escapeSlashes = function (str) {
-  return str.slice(1).split('/').join('.')
-}
-
 exports.urlFromId = function (id) {
   return 'http://images.mtvnn.com/' + id + '/original'
 }

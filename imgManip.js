@@ -1,6 +1,7 @@
 var gm = require('gm')
 	, exec = require('child_process').exec
 	, fs = require('fs')
+	, config = require('./config')
 
 	, cwd = process.cwd()
 
@@ -8,19 +9,15 @@ function execCommand (command, cb) {
 	console.log('\nExecuting ', command)
 	exec(command
 		, { cwd: cwd }
-		, function (err) {
-			cb(err)
-		})
+		, cb)
 }
 
 module.exports = exports = {}
 
-exports.effect = function (effect, subject, dimensions, out, cb) {
-	if (!effect) {
-		effect = 'smartResize'
-	}
+exports.effect = function (query, subject, dimensions, out, cb) {
+	var effect = (query.effect) ? query.effect : 'smartResize'
 	try {
-		exports[effect](subject, dimensions, out, cb)
+		exports.effects[effect](subject, query, dimensions, out, cb)
 	} catch (e) {
 		e.message += ": " + config.invalidRequestMessage
 		e.effect = effect
@@ -28,22 +25,8 @@ exports.effect = function (effect, subject, dimensions, out, cb) {
 	}
 }
 
-exports.avatar = function (subject, dimensions, out, cb) {
-	exports.transparentMask(subject
-		, __dirname + '/images/avatar_mask.png'
-		, dimensions
-		, out
-		, cb)
-}
-
-
-
-
-
-
-
-
-exports.smartResize = function (subject, dimensions, out, cb) {
+exports.effects = {}
+exports.effects.smartResize = function (subject, ignored, dimensions, out, cb) {
 	var dimensionsString = dimensions.width + "x" + dimensions.height
 		, newOut = out + '.jpg'
 	execCommand("gm convert '" + subject + "'"
@@ -51,18 +34,48 @@ exports.smartResize = function (subject, dimensions, out, cb) {
 		+ " -gravity 'Center'"
 		+ " -crop '" + dimensionsString + "+0+0'"
 		+ " '" + newOut + "'"
-		, function () {
-			cb(null, newOut)
+		, function (err) {
+			cb(err, newOut)
 		})
 }
+exports.effects.mask = function (subject, options, dimensions, out, cb) {
+	exports.mask(subject
+		, __dirname + '/images/' + options.mask + '.png'
+		, '#' + options.fillColor
+		, dimensions
+		, out
+		, cb)
+}
+exports.effects.tMask = function (subject, options, dimensions, out, cb) {
+	exports.tMask(subject
+		, __dirname + '/images/' + options.mask + '.png'
+		, dimensions
+		, out
+		, cb)
+}
+exports.effects.overlay = function (subject, options, dimensions, out, cb) {
+	exports.overlay(subject
+		, __dirname + '/images/' + options.overlay + '.png'
+		, dimensions
+		, out
+		, cb)
+}
+exports.effects.composite = function (subject, options, dimensions, out, cb) {
+	exports.composite(subject
+		, __dirname + '/images/' + options.overlay + '.png'
+		, dimensions
+		, out
+		, cb)
+}
+
 exports.darken = function (subject, color, factor, out, cb) {
 	var newOut = out + '.jpg'
 	execCommand("gm convert '" + subject + "'"
 		+ " -fill '" + color + "'"
 		+ " -colorize '" + factor + "'"
 		+ " '" + newOut + "'"
-		, function () {
-			cb(null, newOut)
+		, function (err) {
+			cb(err, newOut)
 		})
 }
 exports.mask = function (subject, mask, color, dimensions, out, cb) {
@@ -85,11 +98,11 @@ exports.mask = function (subject, mask, color, dimensions, out, cb) {
 		+ " -compose 'src-over'"
 		+ " -composite "
 		+ " '" + newOut + "'"
-		, function () {
-			cb(null, newOut)
+		, function (err) {
+			cb(err, newOut)
 		})
 }
-exports.transparentMask = function (subject, mask, dimensions, out, cb) {
+exports.tMask = function (subject, mask, dimensions, out, cb) {
 	var dimensionsString = dimensions.width + "x" + dimensions.height
 		, newOut = out + '.png'
 	execCommand("/usr/local/opt/imagemagick/bin/convert"
@@ -102,8 +115,8 @@ exports.transparentMask = function (subject, mask, dimensions, out, cb) {
 		+ " -gravity 'Center' \\)"
 		+ " -compose 'CopyOpacity' -composite"
 		+ " '" + newOut + "'"
-		, function () {
-			cb(null, newOut)
+		, function (err) {
+			cb(err, newOut)
 		})
 }
 exports.overlay = function (subject, overlay, dimensions, out, cb) {
@@ -118,11 +131,11 @@ exports.overlay = function (subject, overlay, dimensions, out, cb) {
 		+ " -resize '" + dimensionsString + "!' \\)"
 		+ " -composite"
 		+ " '" + newOut + "'"
-		, function () {
-			cb(null, newOut)
+		, function (err) {
+			cb(err, newOut)
 		})
 }
-exports.compositeOverlay = function (subject, overlay, dimensions, out, cb) {
+exports.composite = function (subject, overlay, dimensions, out, cb) {
 	var dimensionsString = dimensions.width + "x" + dimensions.height
 		, newOut = out + '.png'
 	execCommand("/usr/local/opt/imagemagick/bin/convert"
@@ -135,8 +148,8 @@ exports.compositeOverlay = function (subject, overlay, dimensions, out, cb) {
 		+ " -gravity 'Center' \\)"
 		+ " -compose 'CopyOpacity' -composite"
 		+ " '" + newOut + "'"
-		, function () {
-			cb(null, newOut)
+		, function (err) {
+			cb(err, newOut)
 		})	
 }
 exports.sprite = function (images, dimensions, tmpDir, spriteName, maxCols, cb) {
@@ -161,16 +174,16 @@ exports.sprite = function (images, dimensions, tmpDir, spriteName, maxCols, cb) 
 					} else {
 						nbLeft -= 1
 						if (nbLeft === 0) {
-							exports.assembleSprites(subSprites, spritePath, function () {
-								cb(null, spritePath)
+							exports.assembleSprites(subSprites, spritePath, function (err) {
+								cb(err, spritePath)
 							})
 						}
 					}
 				})
 		}
 	} else {
-		exports.subSprite(images, dimensions, spritePath, function () {
-			cb(null, spritePath)
+		exports.subSprite(images, dimensions, spritePath, function (err) {
+			cb(err, spritePath)
 		})
 	}
 }
