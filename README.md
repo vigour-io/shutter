@@ -8,6 +8,8 @@ ImageMagick `brew install ImageMagick`
 
 <a name='api'></a>
 ## Usage
+- Start an instance of vigour-hub
+- Populate it with MTV data
 - Start the server (`npm start`)
 - Issue a GET request to one of the following addresses to obtain the sprite corresponding to the provided parameters
     + `/sprite/:country/:lang/shows/:width/:height`
