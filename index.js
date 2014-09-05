@@ -18,6 +18,10 @@ var express = require('express')
 
 	, subscribeObj = {}
 
+cloud.on('error', function (err) {
+	log.error('cloud error', err)
+})
+
 subscribeObj[config.mtvCloudDataFieldName] =  {
 	// regions: {
 		// $: {

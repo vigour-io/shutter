@@ -8,7 +8,7 @@
   },
   "main": "./index.js",
   "scripts": {
-    "start": "sudo supervisor --ignore README.md,LICENSE,.gitignore,.DS_Store,package.json,tmp index.js"
+    "start": "sudo forever -l forever.log -o log.stdout -e log.stderr index.js"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -24,7 +24,6 @@
     "gm": "^1.16.0",
     "npmlog": "^0.1.1",
     "rimraf": "^2.2.8",
-    "supervisor": "^0.6.0",
     "vigour-fs": "git+ssh://git@github.com:vigour-io/vigour-fs.git#master",
     "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
     "ws": "^0.4.32"
