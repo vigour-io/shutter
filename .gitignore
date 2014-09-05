@@ -2,5 +2,7 @@ tmp/*
 .DS_Store
 node_modules/
 tests/out/*
+forever.log
 log.stdout
 log.stderr
+nohup.out
