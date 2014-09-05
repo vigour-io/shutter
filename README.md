@@ -9,6 +9,7 @@ ImageMagick `brew install ImageMagick`
 <a name='api'></a>
 ## Usage
 - Start an instance of vigour-hub
+- In **config.js**, set `cloudHost` and `cloudPort` to point the that hub
 - Populate it with MTV data
 - Start the server (`npm start`)
 - Issue a GET request to one of the following addresses to obtain the sprite corresponding to the provided parameters
