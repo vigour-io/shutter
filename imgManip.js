@@ -4,6 +4,11 @@ var gm = require('gm')
 	, config = require('./config')
 
 	, cwd = process.cwd()
+	, imConvertPath = process.env.IM_CONVERT_PATH
+
+if (!imConvertPath) {
+	throw "Please set environment variable IM_CONVERT_PATH to the location of ImageMagick's `convert`"
+}
 
 function execCommand (command, cb) {
 	console.log('\nExecuting ', command)
@@ -81,7 +86,7 @@ exports.darken = function (subject, color, factor, out, cb) {
 exports.mask = function (subject, mask, color, dimensions, out, cb) {
 	var dimensionsString = dimensions.width + "x" + dimensions.height
 		, newOut = out + '.jpg'
-	execCommand("/usr/local/opt/imagemagick/bin/convert -size '" + dimensionsString + "'"
+	execCommand(imConvertPath + " -size '" + dimensionsString + "'"
 		+ " xc:'" + color + "'"
 		+ " \\( "
 			+ " \\( '" + subject + "'"
@@ -105,7 +110,7 @@ exports.mask = function (subject, mask, color, dimensions, out, cb) {
 exports.tMask = function (subject, mask, dimensions, out, cb) {
 	var dimensionsString = dimensions.width + "x" + dimensions.height
 		, newOut = out + '.png'
-	execCommand("/usr/local/opt/imagemagick/bin/convert"
+	execCommand(imConvertPath
 		+ " \\( '" + subject + "'"
 		+ " -resize '" + dimensionsString + "^'"
 		+ " -gravity 'Center'"
@@ -122,7 +127,7 @@ exports.tMask = function (subject, mask, dimensions, out, cb) {
 exports.overlay = function (subject, overlay, dimensions, out, cb) {
 	var dimensionsString = dimensions.width + "x" + dimensions.height
 		, newOut = out + '.jpg'
-	execCommand("/usr/local/opt/imagemagick/bin/convert"
+	execCommand(imConvertPath
 		+ " \\( '" + subject + "'"
 		+ " -resize '" + dimensionsString + "^'"
 		+ " -gravity 'Center'"
@@ -138,7 +143,7 @@ exports.overlay = function (subject, overlay, dimensions, out, cb) {
 exports.composite = function (subject, overlay, dimensions, out, cb) {
 	var dimensionsString = dimensions.width + "x" + dimensions.height
 		, newOut = out + '.png'
-	execCommand("/usr/local/opt/imagemagick/bin/convert"
+	execCommand(imConvertPath
 		+ " \\( '" + subject + "'"
 		+ " -resize '" + dimensionsString + "^'"
 		+ " -gravity 'Center'"
