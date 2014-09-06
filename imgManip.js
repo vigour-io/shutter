@@ -1,5 +1,4 @@
-var gm = require('gm')
-	, exec = require('child_process').exec
+var exec = require('child_process').exec
 	, fs = require('fs')
 	, config = require('./config')
 
