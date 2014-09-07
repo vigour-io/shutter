@@ -73,6 +73,7 @@ app.get('/image/:id/:width/:height'
 			, path
 		fs.exists(out + '.jpg', function (exists) {
 			if (exists) {
+				util.setHeaders(res)
 				res.sendFile(out + '.jpg'
 					, {
 						root: __dirname
@@ -85,6 +86,7 @@ app.get('/image/:id/:width/:height'
 			} else {
 				fs.exists(out + '.png', function (exists) {
 					if (exists) {
+						util.setHeaders(res)
 						res.sendFile(out + '.png'
 							, {
 								root: __dirname
