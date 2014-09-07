@@ -125,3 +125,20 @@ imgManip.effect({
 			console.log('bluf effect done', path)
 		}
 	})
+
+imgManip.effect({
+		effect: 'overlayBlur'
+		, overlay: 'overlay'
+		, radius: 0
+		, sigma: 4
+	}
+	, subject
+	, dimensions
+	, outDir + '/overlayBlur'
+	, function (err, path) {
+		if (err) {
+			console.log('overlayBlur effect error', err)
+		} else {
+			console.log('overlayBlur effect done', path)
+		}
+	})

@@ -12,6 +12,9 @@ Forever `sudo npm install -g forever`
 - Start an instance of vigour-hub
 - In **config.js**, set `cloudHost` and `cloudPort` to point the that hub
 - Populate it with MTV data
+- Add path to ImageMagick's convert command as environment variable `IM_CONVERT_PATH`, e.g.
+    + On EC2 instance: `export IM_CONVERT_PATH=/usr/bin/convert`
+    + On my computer: `export IM_CONVERT_PATH=/usr/local/opt/imagemagick/bin/convert`
 - Start the server (`nohup npm start &`)
 - Logging will be available in `nohup.out`
 - Issue a GET request to one of the following addresses to obtain the sprite corresponding to the provided parameters
@@ -26,6 +29,7 @@ Forever `sudo npm install -g forever`
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210` (equivalent to `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=smartResize`)
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=tMask&mask=logoMask`
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=blur&radius=0&sigma=3`
+        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=overlayBlur&overlay=overlay&radius=0&sigma=3`
     + Check `vigour-img/images/` for available masks and overlays
     + Check `http://www.imagemagick.org/Usage/blur/blur_montage.jpg` for blur arguments radius and sigma (<radius>x<sigma>)
 

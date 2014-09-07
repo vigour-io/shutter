@@ -79,6 +79,50 @@ exports.effects.blur = function (subject, options, dimensions, out, cb) {
 		, out
 		, cb)
 }
+exports.effects.overlayBlur = function (subject, options, dimensions, out, cb) {
+	exports.overlayBlur(subject
+		, __dirname + '/images/' + options.overlay + '.png'
+		, options.radius
+		, options.sigma
+		, dimensions
+		, out
+		, cb)
+}
+
+exports.overlayBlur = function (subject, overlay, radius, sigma, dimensions, out, cb) {
+	var dimensionsString = dimensions.width + "x" + dimensions.height
+		, newOut = out + '.jpg'
+	execCommand(imConvertPath
+		+ " \\( '" + subject + "'"
+		+ " -resize '" + dimensionsString + "^'"
+		+ " -gravity 'Center'"
+		+ " -crop '" + dimensionsString + "+0+0'"
+		+ " -blur '" + radius + "x" + sigma + "' \\)"
+		+ " \\( '" + overlay + "'"
+		+ " -resize '" + dimensionsString + "!' \\)"
+		+ " -composite"
+		+ " '" + newOut + "'"
+		, function (err) {
+			cb(err, newOut)
+		})
+}
+
+exports.overlay = function (subject, overlay, dimensions, out, cb) {
+	var dimensionsString = dimensions.width + "x" + dimensions.height
+		, newOut = out + '.jpg'
+	execCommand(imConvertPath
+		+ " \\( '" + subject + "'"
+		+ " -resize '" + dimensionsString + "^'"
+		+ " -gravity 'Center'"
+		+ " -crop '" + dimensionsString + "+0+0' \\)"
+		+ " \\( '" + overlay + "'"
+		+ " -resize '" + dimensionsString + "!' \\)"
+		+ " -composite"
+		+ " '" + newOut + "'"
+		, function (err) {
+			cb(err, newOut)
+		})
+}
 
 exports.blur = function (subject, radius, sigma, dimensions, out, cb) {
 	var newOut = out + '.jpg'
@@ -145,22 +189,7 @@ exports.tMask = function (subject, mask, dimensions, out, cb) {
 			cb(err, newOut)
 		})
 }
-exports.overlay = function (subject, overlay, dimensions, out, cb) {
-	var dimensionsString = dimensions.width + "x" + dimensions.height
-		, newOut = out + '.jpg'
-	execCommand(imConvertPath
-		+ " \\( '" + subject + "'"
-		+ " -resize '" + dimensionsString + "^'"
-		+ " -gravity 'Center'"
-		+ " -crop '" + dimensionsString + "+0+0' \\)"
-		+ " \\( '" + overlay + "'"
-		+ " -resize '" + dimensionsString + "!' \\)"
-		+ " -composite"
-		+ " '" + newOut + "'"
-		, function (err) {
-			cb(err, newOut)
-		})
-}
+
 exports.composite = function (subject, overlay, dimensions, out, cb) {
 	var dimensionsString = dimensions.width + "x" + dimensions.height
 		, newOut = out + '.png'
