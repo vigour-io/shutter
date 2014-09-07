@@ -25,7 +25,9 @@ Forever `sudo npm install -g forever`
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=overlay&overlay=overlay`
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210` (equivalent to `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=smartResize`)
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=tMask&mask=logoMask`
+        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=blur&radius=0&sigma=3`
     + Check `vigour-img/images/` for available masks and overlays
+    + Check `http://www.imagemagick.org/Usage/blur/blur_montage.jpg` for blur arguments radius and sigma (<radius>x<sigma>)
 
 queryString | options | result
 ---|---|---

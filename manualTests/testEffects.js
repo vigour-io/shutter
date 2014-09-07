@@ -109,3 +109,19 @@ imgManip.effect({
 			console.log('avatar effect done', path)
 		}
 	})
+
+imgManip.effect({
+		effect: 'blur'
+		, radius: 0
+		, sigma: 3
+	}
+	, subject
+	, dimensions
+	, outDir + '/blur'
+	, function (err, path) {
+		if (err) {
+			console.log('blur effect error', err)
+		} else {
+			console.log('bluf effect done', path)
+		}
+	})

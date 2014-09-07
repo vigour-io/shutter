@@ -71,6 +71,28 @@ exports.effects.composite = function (subject, options, dimensions, out, cb) {
 		, out
 		, cb)
 }
+exports.effects.blur = function (subject, options, dimensions, out, cb) {
+	exports.blur(subject
+		, options.radius
+		, options.sigma
+		, dimensions
+		, out
+		, cb)
+}
+
+exports.blur = function (subject, radius, sigma, dimensions, out, cb) {
+	var newOut = out + '.jpg'
+		, dimensionsString = dimensions.width + "x" + dimensions.height
+	execCommand("gm convert '" + subject + "'"
+		+ " -resize '" + dimensionsString + "^'"
+		+ " -gravity 'Center'"
+		+ " -crop '" + dimensionsString + "+0+0'"
+		+ " -blur '" + radius + "x" + sigma + "'"
+		+ " '" + newOut + "'"
+		, function (err) {
+			cb(err, newOut)
+		})
+}
 
 exports.darken = function (subject, color, factor, out, cb) {
 	var newOut = out + '.jpg'
