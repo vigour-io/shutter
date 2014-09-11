@@ -1,6 +1,5 @@
 module.exports = exports = {
-	spriteName: 'sprite'
-	, tmpDir: 'tmp'
+	tmpDir: 'tmp'
 	, outDir: 'out'
 	, maxCols: 10
 

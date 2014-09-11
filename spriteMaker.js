@@ -5,125 +5,110 @@ var fs = require('vigour-fs')
 
 	, config = require('./config')
 
-module.exports = exports = {
-	requestSprite: function (req, res, next) {
-		var items = dive(data.raw, req.pathToSpriteData)
-		if (items) {
-			getSprite(req, res, items)
-		} else {
-			res.status(400).end(config.invalidRequestMessage)
+module.exports = exports = {}
+exports.requestSprite = function (pathToSpriteData, data, params, tmpDir, dimensions, out, cb) {
+	var items = dive(data.raw, pathToSpriteData)
+	if (items) {
+		getSprite(items, params, tmpDir, dimensions, out, cb)
+	} else {
+		cb({
+			status: 400
+			, msg: config.invalidRequestMessage
+		})
+	}
+}
+
+function getSprite (items, params, tmpDir, dimensions, out, cb) {
+	var ids = []
+		, l
+		, i
+		, nbLeft
+		, id
+		, url
+		, path
+		, paths = []
+		, errMessage
+	for (item in items) {
+		ids[items[item].number - 1] = items[item].img
+	}
+	nbLeft = l = ids.length
+	if (l === 0) {
+		cb({
+			status: 400
+			, msg: config.invalidRequestMessage
+		})
+	} else {
+		for (i = 0; i < l; i += 1) {
+			if (ids[i]) {
+				id = ids[i]
+				url = util.urlFromId(id)
+				path = tmpDir + '/' + ids[i]
+			} else {
+				url = false
+				path = 'images/mtv_logo_placeholder.png'
+			}
+			paths.push(path)
+			if (url) {
+				fs.writeFile(path, url, {
+						maxTries: config.maxTries
+				    , retryOn404: true	// MTV sometimes responds with 404 even when retries work
+					}
+					, function (err) {
+						if (err) {
+							errMessage = "\nDownload error (" + url + "). "
+							log.error(errMessage, err)
+							cb({
+								status: 500
+								, msg: errMessage + err
+							})
+							util.cleanup(tmpDir)
+						} else {
+							nbLeft -= 1
+							getSpriteIfReady(nbLeft
+								, paths
+								, dimensions
+								, tmpDir
+								, out
+								, cb)
+						}
+					})
+			} else {
+				nbLeft -= 1
+				getSpriteIfReady(nbLeft
+					, paths
+					, dimensions
+					, tmpDir
+					, out
+					, cb)
+			}
 		}
 	}
 }
 
-function getSprite (req, res, items) {
-	var tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
-		, desiredDimensions = {
-			width: req.params.width
-			, height: req.params.height
-		}
-	util.prepare(function (err) {
-		if (err) {
-			errMessage = "\nError creating temp directory " + config.tmpDir + ": "
-			console.error(errMessage, err)
-			res.status(500).end(errMessage + err)
-		} else {
-			fs.mkdir(tmpDir, function (err) {
-				var ids = []
-					, l
-					, i
-					, nbLeft
-					, id
-					, url
-					, path
-					, paths = []
-					, errMessage
-				if (err) {
-					errMessage = "\nError creating temp directory " + tmpDir + ": "
-					console.error(errMessage, err)
-					res.status(500).end(errMessage + err)
-				} else {
-					for (item in items) {
-						ids[items[item].number - 1] = items[item].img
-					}
-					nbLeft = l = ids.length
-					if (l === 0) {
-						res.status(400).end(config.invalidRequestMessage)
-					} else {
-						for (i = 0; i < l; i += 1) {
-							if (ids[i]) {
-								id = ids[i]
-								url = util.urlFromId(id)
-								path = tmpDir + '/' + ids[i]
-							} else {
-								url = false
-								path = 'images/mtv_logo_placeholder.png'
-							}
-							paths.push(path)
-							if (url) {
-								fs.writeFile(path, url, {
-										maxTries: config.maxTries
-								    , retryOn404: true	// MTV sometimes responds with 404 even when retries work
-									}
-									, function (err) {
-										if (err) {
-											errMessage = "\nDownload error (" + url + "). "
-											console.error(errMessage, err)
-											res.status(500).end(errMessage + err)
-											util.cleanup(tmpDir)
-										} else {
-											nbLeft -= 1
-											getSpriteIfReady(nbLeft
-												, paths
-												, desiredDimensions
-												, tmpDir
-												, res)
-										}
-									})
-							} else {
-								nbLeft -= 1
-								getSpriteIfReady(nbLeft
-									, paths
-									, desiredDimensions
-									, tmpDir
-									, res)
-							}
-						}
-					}
-				}
-			})
-		}
-	})
-}
-
-function getSpriteIfReady (nbLeft, paths, desiredDimensions, tmpDir, res) {
+function getSpriteIfReady (nbLeft, paths, dimensions, tmpDir, out, cb) {
 	if (nbLeft === 0) {
 		imgManip.sprite(paths
-			, desiredDimensions
+			, dimensions
 			, tmpDir
-			, config.spriteName
 			, config.maxCols
-			, function (err) {
+			, out
+			, function (err, spriteName) {
 				var errMessage
 				if (err) {
 					errMessage = "\nError creating sprite: "
-					console.error(errMessage, err)
-					res.status(500).end(errMessage + err)
+					log.error(errMessage, err)
+					cb({
+						status: 500
+						, msg: errMessage + err
+					})
 					util.cleanup(tmpDir)
 				} else {
-					util.setHeaders(res)
-
-					res.sendFile(tmpDir + '/' + config.spriteName + '.jpg'
-						, {
-							root: __dirname
-							// , dotfiles: 'allow'
+					cb(null, spriteName, function (err) {
+						if (err) {
+							log.error(err)
 						}
-						, function (err) {
-							if (err) {
-								console.error(err)
-							}
-							util.cleanup(tmpDir)
-						})
+						util.cleanup(tmpDir)
+					})
 				}
 			})
 	}

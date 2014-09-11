@@ -1,0 +1,11 @@
+localhost/image/55f50432fd73e366c69956ad3cb97a59/150/150?effect=tMask&mask=avatarMask
+localhost/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=composite&overlay=overlay
+localhost/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=mask&mask=logoMask&fillColor=EE255C
+localhost/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=overlay&overlay=overlay
+localhost/image/55f50432fd73e366c69956ad3cb97a59/370/210
+localhost/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=tMask&mask=logoMask
+localhost/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=blur&radius=0&sigma=3
+localhost/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=overlayBlur&overlay=overlay&radius=0&sigma=3
+
+localhost/sprite/Netherlands/en/shows/370/210
+localhost/sprite/Netherlands/en/episodes/1741/4714/370/210
