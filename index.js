@@ -1,5 +1,6 @@
 var express = require('express')
 	, bodyParser = require('body-parser')
+	, expressValidator = require('express-validator')
 	, log = require('npmlog')
 
 	Cloud = require('vigour-js/browser/network/cloud')
@@ -78,6 +79,7 @@ app = express();
 app.use(bodyParser.urlencoded({
 	extended: true
 }))
+app.use(expressValidator())
 
 function serveCached (req, res, next) {
 	var filePath = req.out + '.jpg'
@@ -171,6 +173,9 @@ function prepare (req, res, next) {
 }
 
 app.get('/image/:id/:width/:height'
+	, validateDimensions
+	, validateImgId
+	, validateEffects
 	, cacheForever(true)
 	, makeOut
 	, serveCached
@@ -217,6 +222,7 @@ app.get('/image/:id/:width/:height'
 		})
 
 app.get('/sprite/:country/:lang/shows/:width/:height'
+	, validateDimensions
 	, cacheForever(false)
 	, makeOut
 	, serveCached
@@ -232,6 +238,7 @@ app.get('/sprite/:country/:lang/shows/:width/:height'
 	, requestSprite)
 
 app.get('/sprite/:country/:lang/episodes/:showId/:seasonId/:width/:height'
+	, validateDimensions
 	, cacheForever(false)
 	, makeOut
 	, serveCached
@@ -262,7 +269,66 @@ data.addListener(function listen () {
 	this.removeListener(listen)
 })
 
+function validateEffects (req, res, next) {
+	var errors
+		, validEffects = [
+			'composite'
+			, 'mask'
+			, 'overlay'
+			, 'tMask'
+			, 'blur'
+			, 'overlayBlur'
+			, 'smartResize'
+		]
+		, fileNameRE = /^[a-zA-Z][\w\.-]*$/
+	if (req.query.effect) {
+		req.checkQuery('effect', 'effect should be a valid effect').isIn(validEffects)
+		if (!errors) {
+			if (~['mask', 'tMask'].indexOf(req.query.effect)) {
+				req.checkQuery('mask', "mask should be a valid file name, without the extension").matches(fileNameRE)
+				if (req.query.effect === 'mask') {
+					req.checkQuery('fillColor', "fillColor should be a valid hexadecimal color").isHexColor()
+					req.sanitize('fillColor').blacklist('#')
+				}
+			} else if (~['overlayBlur', 'overlay', 'composite'].indexOf(req.query.effect)) {
+				req.checkQuery('overlay', '').matches(fileNameRE)
+			}
+			if (~['overlayBlur', 'blur'].indexOf(req.query.effect)) {
+				req.checkQuery('radius', "radius should be an integer").isInt()
+				req.checkQuery('sigma', "sigma should be an integer").isInt()
+			}
+		}
+	}
+	errors = req.validationErrors()
+	if (errors) {
+		res.status(400).end(config.invalidRequestMessage + '\n' + JSON.stringify(errors))
+	} else {
+		next()
+	}
+}
 
+function validateImgId (req, res, next) {
+	var errors
+	req.checkParams('id', "id should be alphanumeric").isAlphanumeric()
+	errors = req.validationErrors()
+	if (errors) {
+		res.status(400).end(config.invalidRequestMessage + '\n' + JSON.stringify(errors))
+	} else {
+		next()
+	}
+}
+
+function validateDimensions (req, res, next) {
+	var errors
+	req.checkParams('width', 'width should be an integer').isInt()
+	req.checkParams('height', 'height should be an integer').isInt()
+	errors = req.validationErrors()
+	if (errors) {
+		res.status(400).end(config.invalidRequestMessage + '\n' + JSON.stringify(errors))
+	} else {
+		next()
+	}
+}
 
 function requestSprite (req, res, next) {
 	spriteMaker.requestSprite(req.pathToSpriteData
