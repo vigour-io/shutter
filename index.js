@@ -11,11 +11,10 @@ var express = require('express')
   , spriteMaker = require('./spriteMaker')
   , imgManip = require('./imgManip')
   , util = require('./util')
-  , HeaderMgr = require('./headerMgr')
+  , setHeaders = require('./setHeaders')
 
 	, config = require('./config')
 
-	, headerMgr = new HeaderMgr()
 	, cloud = new Cloud('ws://' + config.cloudHost + ':' + config.cloudPort)
 	, data = new Data(cloud.data.get(config.mtvCloudDataFieldName))
 
@@ -32,6 +31,10 @@ Object.defineProperty(Error.prototype, 'toJSON', {
         return alt
     },
     configurable: true
+})
+
+cloud.on('welcome', function (err) {
+	log.info('cloud welcome')
 })
 
 cloud.on('error', function (err) {
@@ -75,6 +78,11 @@ subscribeObj[config.mtvCloudDataFieldName] =  {
 cloud.subscribe(subscribeObj)
 
 app = express();
+
+app.use(function (req, res, next) {
+	log.info(req.method, req.originalUrl)
+	next()
+})
 
 app.use(bodyParser.urlencoded({
 	extended: true
@@ -120,25 +128,20 @@ function cacheForever (bool) {
 }
 
 function serve (res, path, cacheForever, cb) {
-	headerMgr.setHeaders(res, path, cacheForever, function (err) {
-		if (err) {
-			log.error('Error setting headers', err)
-			// TODO Warn dev team
+	setHeaders(res, cacheForever)
+	res.sendFile(path
+		, {
+			root: __dirname
 		}
-		res.sendFile(path
-			, {
-				root: __dirname
+		, function (err) {
+			if (err) {
+				log.error('Error sending file', err)
+				// TODO Warn dev team
 			}
-			, function (err) {
-				if (err) {
-					log.error('Error sending file', err)
-					// TODO Warn dev team
-				}
-				if (cb) {
-					cb(err)	
-				}
-			})
-	})
+			if (cb) {
+				cb(err)	
+			}
+		})
 }
 
 function makeOut (req, res, next) {
