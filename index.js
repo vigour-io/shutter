@@ -20,6 +20,8 @@ var express = require('express')
 
 	, subscribeObj = {}
 
+log.info('Image server starting')
+
 Object.defineProperty(Error.prototype, 'toJSON', {
     value: function () {
         var alt = {}
@@ -42,37 +44,33 @@ cloud.on('error', function (err) {
 })
 
 subscribeObj[config.mtvCloudDataFieldName] =  {
-	// regions: {
-		// $: {
-		// 	$: {
-		'Netherlands': { // Only use Netherlands until the cloud can support more
-			$: {	// Only use en until the cloud can support more
-				shows: {
-					$: {
-						img: true
-						, number: true
-						, seasons: {
-							$: {
-								number: true
-								, episodes: {
-									$: {
-										img: true
-										, number: true
-									}
+	$: {
+		$: {
+			shows: {
+				$: {
+					img: true
+					, number: true
+					, seasons: {
+						$: {
+							number: true
+							, episodes: {
+								$: {
+									img: true
+									, number: true
 								}
 							}
 						}
 					}
-				},
-				channels: {
-					$: {
-						img: true
-						, number: true
-					}
+				}
+			},
+			channels: {
+				$: {
+					img: true
+					, number: true
 				}
 			}
 		}
-	// }
+	}
 }
 
 cloud.subscribe(subscribeObj)
