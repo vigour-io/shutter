@@ -20,6 +20,8 @@ var express = require('express')
 
 	, subscribeObj = {}
 
+console.log('starting')
+
 Object.defineProperty(Error.prototype, 'toJSON', {
     value: function () {
         var alt = {}
