@@ -3,7 +3,7 @@ var express = require('express')
 	, expressValidator = require('express-validator')
 	, log = require('npmlog')
 
-	Cloud = require('vigour-js/browser/network/cloud')
+	, Cloud = require('vigour-js/browser/network/cloud')
     .inject(require('vigour-js/browser/network/cloud/datacloud'))
   , Data = require('vigour-js/data')
   , fs = require('vigour-fs')
@@ -20,8 +20,6 @@ var express = require('express')
 
 	, subscribeObj = {}
 
-log.info('Image server starting')
-
 Object.defineProperty(Error.prototype, 'toJSON', {
     value: function () {
         var alt = {}
@@ -35,50 +33,10 @@ Object.defineProperty(Error.prototype, 'toJSON', {
     configurable: true
 })
 
-cloud.on('welcome', function (err) {
-	log.info('cloud welcome')
-})
-
-cloud.on('error', function (err) {
-	log.error('cloud error', err)
-})
-
-subscribeObj[config.mtvCloudDataFieldName] =  {
-	$: {
-		$: {
-			shows: {
-				$: {
-					img: true
-					, number: true
-					, seasons: {
-						$: {
-							number: true
-							, episodes: {
-								$: {
-									img: true
-									, number: true
-								}
-							}
-						}
-					}
-				}
-			},
-			channels: {
-				$: {
-					img: true
-					, number: true
-				}
-			}
-		}
-	}
-}
-
-cloud.subscribe(subscribeObj)
-
 app = express();
 
 app.use(function (req, res, next) {
-	log.info(req.method, req.originalUrl)
+	console.log(req.method, req.originalUrl)
 	next()
 })
 
@@ -86,92 +44,6 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }))
 app.use(expressValidator())
-
-function serveCached (req, res, next) {
-	var filePath = req.out + '.jpg'
-	serveIfExists(filePath
-		, req.cacheForever
-		, res
-		, function (err) {
-			if (err) {
-				filePath = req.out + '.png'
-				serveIfExists(filePath
-					, req.cachedForever
-					, res
-					, function (err) {
-						if (err) {
-							next()
-						}
-					})
-			}
-		})
-}
-
-function serveIfExists (path, cacheForever, res, cb) {
-	fs.exists(path, function (exists) {
-		if (exists) {
-			serve(res, path, cacheForever)
-			cb(null)
-		} else {
-			cb(true)
-		}
-	})
-}
-
-function cacheForever (bool) {
-	return function (req, res, next) {
-		req.cacheForever = bool
-		next()
-	}
-}
-
-function serve (res, path, cacheForever, cb) {
-	setHeaders(res, cacheForever)
-	res.sendFile(path
-		, {
-			root: __dirname
-		}
-		, function (err) {
-			if (err) {
-				log.error('Error sending file', err)
-				// TODO Warn dev team
-			}
-			if (cb) {
-				cb(err)	
-			}
-		})
-}
-
-function makeOut (req, res, next) {
-	try {
-		req.out = config.outDir + '/' + encodeURIComponent(req.originalUrl)
-		next()
-	} catch (e) {
-		invalidRequest(res)
-	}
-}
-
-function invalidRequest (res) {
-	res.status(400).end(config.invalidRequestMessage)
-}
-
-function prepare (req, res, next) {
-	req.tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
-	fs.mkdir(req.tmpDir, function (err) {
-		if (err) {
-			err.detail = 'fs.mkdir error'
-			err.path = req.tmpDir
-			res.status(500).end(JSON.stringify(err, null, " "))
-		} else {
-			req.dimensions = {
-				width: req.params.width
-				, height: req.params.height
-			}
-			next()		
-		}
-	})
-	
-}
 
 app.get('/image/:id/:width/:height'
 	, validateDimensions
@@ -184,6 +56,7 @@ app.get('/image/:id/:width/:height'
 	, function (req, res, next) {
 		var url = util.urlFromId(req.params.id)
 			, path = req.tmpDir + '/' + 'original'
+		console.log("Downloading original image")
 		fs.writeFile(path
 			, url
 			, {
@@ -199,6 +72,7 @@ app.get('/image/:id/:width/:height'
 					res.status(500).end(JSON.stringify(err, null, " "))
 					util.cleanup(req.tmpDir)
 				} else {
+					console.log("Transforming image")
 					imgManip.effect(req.query
 						, path
 						, req.dimensions
@@ -213,6 +87,7 @@ app.get('/image/:id/:width/:height'
 								res.status(500).end(JSON.stringify(err, null, " "))
 								util.cleanup(req.tmpDir)
 							} else {
+								console.log("Serving image")
 								serve(res, newPath, req.cacheForever, function (err) {
 									util.cleanup(req.tmpDir)
 								})
@@ -263,12 +138,145 @@ app.get('*'
 		invalidRequest(res)
 	})
 
+cloud.on('welcome', function (err) {
+	console.log('cloud welcome')
+})
 
-data.addListener(function listen () {
+cloud.on('error', function (err) {
+	log.error('cloud error', err)
+})
+
+subscribeObj[config.mtvCloudDataFieldName] =  {
+	$: {
+		$: {
+			shows: {
+				$: {
+					img: true
+					, number: true
+					, seasons: {
+						$: {
+							number: true
+							, episodes: {
+								$: {
+									img: true
+									, number: true
+								}
+							}
+						}
+					}
+				}
+			},
+			channels: {
+				$: {
+					img: true
+					, number: true
+				}
+			}
+		}
+	}
+}
+
+cloud.subscribe(subscribeObj)
+
+data.addListener(listen)
+
+function listen () {
+	console.log("Listen called")
 	app.listen(config.port);
 	console.log('Listening on port ', config.port);
 	this.removeListener(listen)
-})
+}
+
+function serveCached (req, res, next) {
+	var filePath = req.out + '.jpg'
+	serveIfExists(filePath
+		, req.cacheForever
+		, res
+		, function (err) {
+			if (err) {
+				filePath = req.out + '.png'
+				serveIfExists(filePath
+					, req.cachedForever
+					, res
+					, function (err) {
+						if (err) {
+							next()
+						}
+					})
+			}
+		})
+}
+
+function serveIfExists (path, cacheForever, res, cb) {
+	fs.exists(path, function (exists) {
+		if (exists) {
+			console.log('Serving existing file')
+			serve(res, path, cacheForever)
+			cb(null)
+		} else {
+			cb(true)
+		}
+	})
+}
+
+function cacheForever (bool) {
+	return function (req, res, next) {
+		req.cacheForever = bool
+		next()
+	}
+}
+
+function serve (res, path, cacheForever, cb) {
+	setHeaders(res, cacheForever)
+	res.sendFile(path
+		, {
+			root: __dirname
+		}
+		, function (err) {
+			if (err) {
+				log.error('Error sending file', err)
+				// TODO Warn dev team
+			} else {
+				console.log("sendFile succeeds", path)
+			}
+			if (cb) {
+				cb(err)	
+			}
+		})
+}
+
+function makeOut (req, res, next) {
+	console.log('making out')
+	try {
+		req.out = config.outDir + '/' + encodeURIComponent(req.originalUrl)
+		next()
+	} catch (e) {
+		invalidRequest(res)
+	}
+}
+
+function invalidRequest (res) {
+	console.log('Serving 400')
+	res.status(400).end(config.invalidRequestMessage)
+}
+
+function prepare (req, res, next) {
+	req.tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
+	console.log('creating temp directory')
+	fs.mkdir(req.tmpDir, function (err) {
+		if (err) {
+			err.detail = 'fs.mkdir error'
+			err.path = req.tmpDir
+			res.status(500).end(JSON.stringify(err, null, " "))
+		} else {
+			req.dimensions = {
+				width: req.params.width
+				, height: req.params.height
+			}
+			next()		
+		}
+	})	
+}
 
 function validateEffects (req, res, next) {
 	var errors
@@ -282,6 +290,7 @@ function validateEffects (req, res, next) {
 			, 'smartResize'
 		]
 		, fileNameRE = /^[a-zA-Z][\w\.-]*$/
+	console.log('validating effects')
 	if (req.query.effect) {
 		req.checkQuery('effect', 'effect should be a valid effect').isIn(validEffects)
 		if (!errors) {
@@ -310,6 +319,7 @@ function validateEffects (req, res, next) {
 
 function validateImgId (req, res, next) {
 	var errors
+	console.log('validating image id')
 	req.checkParams('id', "id should be alphanumeric").isAlphanumeric()
 	errors = req.validationErrors()
 	if (errors) {
@@ -321,6 +331,7 @@ function validateImgId (req, res, next) {
 
 function validateDimensions (req, res, next) {
 	var errors
+	console.log('validating dimensions')
 	req.checkParams('width', 'width should be an integer').isInt()
 	req.checkParams('height', 'height should be an integer').isInt()
 	errors = req.validationErrors()
@@ -332,6 +343,7 @@ function validateDimensions (req, res, next) {
 }
 
 function requestSprite (req, res, next) {
+	console.log('requesting sprite')
 	spriteMaker.requestSprite(req.pathToSpriteData
 		, data
 		, req.params
@@ -345,6 +357,7 @@ function requestSprite (req, res, next) {
 				log.error('spriteMaker.requestSprite error', err)
 				res.status(err.status).end(JSON.stringify(err, null, " "))
 			} else {
+				console.log("Serving sprite")
 				serve(res, spritePath, req.cacheForever, function (err) {
 					util.cleanup(req.tmpDir)
 				})
