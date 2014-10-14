@@ -58,11 +58,11 @@ app.get('/image/:id/:width/:height'
 	, function (req, res, next) {
 		var url = util.urlFromId(req.params.id)
 		req.pathToOriginal = config.originalsPath + '/' + req.params.id
-		console.log("Downloading original image")
 		fs.exists(req.pathToOriginal, function (exists) {
 			if (exists) {
 				next()
 			} else {
+				console.log("Downloading original image")
 				fs.writeFile(req.pathToOriginal
 					, url
 					, {
