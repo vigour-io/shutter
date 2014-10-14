@@ -1,6 +1,7 @@
 module.exports = exports = {
 	tmpDir: 'tmp'
 	, outDir: 'out'
+	, originalsPath: 'originals'
 	, maxCols: 10
 
 	, maxTries: 6

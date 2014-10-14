@@ -57,47 +57,56 @@ app.get('/image/:id/:width/:height'
 	, prepare
 	, function (req, res, next) {
 		var url = util.urlFromId(req.params.id)
-			, path = req.tmpDir + '/' + 'original'
+		req.pathToOriginal = config.originalsPath + '/' + req.params.id
 		console.log("Downloading original image")
-		fs.writeFile(path
-			, url
-			, {
-				maxTries: config.maxTries
-				, retryOn404: true	// MTV's image server sometimes returns 404 even if image does exists, i.e. retrying may work
-			}
-			, function (err) {
+		fs.exists(req.pathToOriginal, function (exists) {
+			if (exists) {
+				next()
+			} else {
+				fs.writeFile(req.pathToOriginal
+					, url
+					, {
+						maxTries: config.maxTries
+						, retryOn404: true	// MTV's image server sometimes returns 404 even if image does exists, i.e. retrying may work
+					}
+					, function (err) {
+						if (err) {
+							err.details = 'vigour-fs.write (download) error'
+							err.path = req.pathToOriginal
+							err.data = url
+							log.error(err.details, err)
+							res.status(500).end(JSON.stringify(err, null, " "))
+							util.cleanup(req.tmpDir)
+						} else {
+							next()
+						}
+					})
+				}		
+			})
+	}
+	, function (req, res, next) {
+		console.log("Transforming image")
+		imgManip.effect(req.query
+			, req.pathToOriginal
+			, req.dimensions
+			, req.out
+			, function (err, newPath) {
 				if (err) {
-					err.details = 'vigour-fs.write (download) error'
-					err.path = path
-					err.data = url
-					log.error(err.details, err)
+					err.details = "imgManip.effect error"
+					err.query = req.query
+					err.path = req.pathToOriginal
+					err.dimensions = req.dimensions
+					err.out = req.out
 					res.status(500).end(JSON.stringify(err, null, " "))
 					util.cleanup(req.tmpDir)
 				} else {
-					console.log("Transforming image")
-					imgManip.effect(req.query
-						, path
-						, req.dimensions
-						, req.out
-						, function (err, newPath) {
-							if (err) {
-								err.details = "imgManip.effect error"
-								err.query = req.query
-								err.path = path
-								err.dimensions = req.dimensions
-								err.out = req.out
-								res.status(500).end(JSON.stringify(err, null, " "))
-								util.cleanup(req.tmpDir)
-							} else {
-								console.log("Serving image")
-								serve(res, newPath, req.cacheForever, function (err) {
-									util.cleanup(req.tmpDir)
-								})
-							}
-						})
+					console.log("Serving image")
+					serve(res, newPath, req.cacheForever, function (err) {
+						util.cleanup(req.tmpDir)
+					})
 				}
 			})
-		})
+	})
 
 app.get('/sprite/:country/:lang/shows/:width/:height'
 	, validateDimensions
@@ -236,8 +245,13 @@ function serve (res, path, cacheForever, cb) {
 		}
 		, function (err) {
 			if (err) {
-				log.error('Error sending file', err)
-				// TODO Warn dev team
+				err.message += ": sendFile error"
+				if (err.code === "ECONNABORT" && res.statusCode === 304) {
+					log.info('sent 304 for', path)
+				} else {
+					log.error('Error sending file', err)
+					// TODO Warn dev
+				}
 			} else {
 				console.log("sendFile succeeds", path)
 			}
