@@ -56,6 +56,33 @@ exports.effects.smartResize = function (subject, ignored, dimensions, out, cb) {
 		cb(error)
 	}
 }
+
+exports.effects.smartResize2 = function (subject, ignored, dimensions, out, cb) {
+	var dimensionsString = dimensions.width + "x" + dimensions.height
+		, error
+	if (subject && dimensions && out && cb) {
+		execCommand("gm convert '" + subject + "'"
+			+ " -resize '" + dimensionsString + "^'"
+			+ " -gravity 'Center'"
+			+ " -crop '" + dimensionsString + "+0+0'"
+			+ " '" + out + "'"
+			, function (err) {
+				cb(err, out)
+			})
+	} else {
+		error = new Error("Invalid request")
+		error.fn = "smartResize2"
+		error.details = "invalid parameters"
+		error.parameters = {
+			subject: subject || "MISSING"
+			, dimensions: dimensions || "MISSING"
+			, out: out || "MISSING"
+			, cb: cb || "MISSING"
+		}
+		cb(error)
+	}
+}
+
 exports.effects.mask = function (subject, options, dimensions, out, cb) {
 	var error
 	if (options.mask && options.fillColor) {
