@@ -47,7 +47,7 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(expressValidator())
 
-app.get('/:filename/:width/:height'
+app.get('/:image/:width/:height'
 	, validateDimensions
 	, validateEffects
 	, cacheForever(true)
@@ -55,19 +55,33 @@ app.get('/:filename/:width/:height'
 	, serveCached
 	, prepare
 	, function (req, res, next) {
-		req.pathToOriginal = 'images/' + req.params.filename
+		var url = req.query.url
+		req.pathToOriginal = config.originalsPath + "/" + req.query.url.slice(req.query.url.lastIndexOf('/') + 1)
 		fs.exists(req.pathToOriginal, function (exists) {
-			var error
 			if (exists) {
 				next()
 			} else {
-				error = new Error("Requested image doesn't exists")
-				error.path = req.pathToOriginal
-				log.error("Filename not found", error)
-				res.status(400).end(JSON.stringify(error, null, " "))
-				util.cleanup(req.tmpDir)
-			}
-		})
+				console.log("Downloading original image")
+				fs.writeFile(req.pathToOriginal
+					, url
+					, {
+						maxTries: config.maxTries
+						, retryOn404: true	// MTV's image server sometimes returns 404 even if image does exists, i.e. retrying may work
+					}
+					, function (err) {
+						if (err) {
+							err.details = 'vigour-fs.write (download) error'
+							err.path = req.pathToOriginal
+							err.data = url
+							log.error(err.details, err)
+							res.status(500).end(JSON.stringify(err, null, " "))
+							util.cleanup(req.tmpDir)
+						} else {
+							next()
+						}
+					})
+				}		
+			})
 	}
 	, function (req, res, next) {
 		console.log("Transforming image")
