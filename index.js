@@ -47,6 +47,52 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(expressValidator())
 
+app.get('/:filename/:width/:height'
+	, validateDimensions
+	, validateEffects
+	, cacheForever(true)
+	, makeOut
+	, serveCached
+	, prepare
+	, function (req, res, next) {
+		req.pathToOriginal = 'images/' + req.params.filename
+		fs.exists(req.pathToOriginal, function (exists) {
+			var error
+			if (exists) {
+				next()
+			} else {
+				error = new Error("Requested image doesn't exists")
+				error.path = req.pathToOriginal
+				log.error("Filename not found", error)
+				res.status(400).end(JSON.stringify(error, null, " "))
+				util.cleanup(req.tmpDir)
+			}
+		})
+	}
+	, function (req, res, next) {
+		console.log("Transforming image")
+		imgManip.effect(req.query
+			, req.pathToOriginal
+			, req.dimensions
+			, req.out
+			, function (err, newPath) {
+				if (err) {
+					err.details = "imgManip.effect error"
+					err.query = req.query
+					err.path = req.pathToOriginal
+					err.dimensions = req.dimensions
+					err.out = req.out
+					res.status(500).end(JSON.stringify(err, null, " "))
+					util.cleanup(req.tmpDir)
+				} else {
+					console.log("Serving image")
+					serve(res, newPath, req.cacheForever, function (err) {
+						util.cleanup(req.tmpDir)
+					})
+				}
+			})
+	})
+
 app.get('/image/:id/:width/:height'
 	, validateDimensions
 	, validateImgId
