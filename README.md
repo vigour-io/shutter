@@ -4,7 +4,7 @@ vigour-img
 Makes a sprite out of an array of urls
 
 ## Dependencies
-ImageMagick `brew install ImageMagick`
+ImageMagick `brew install ImageMagick` or `yum install ImageMagick`
 Forever `sudo npm install -g forever`
 
 <a name='api'></a>
