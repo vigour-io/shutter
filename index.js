@@ -3,22 +3,22 @@ var express = require('express')
 	, expressValidator = require('express-validator')
 	, log = require('npmlog')
 
-	, Cloud = require('vigour-js/browser/network/cloud')
-    .inject(require('vigour-js/browser/network/cloud/datacloud'))
-  , Data = require('vigour-js/data')
-  , fs = require('vigour-fs')
+	// , Cloud = require('vigour-js/browser/network/cloud')
+	// 	.inject(require('vigour-js/browser/network/cloud/datacloud'))
+	// , Data = require('vigour-js/data')
+	, fs = require('vigour-fs')
 
-  , spriteMaker = require('./spriteMaker')
-  , imgManip = require('./imgManip')
-  , util = require('./util')
-  , setHeaders = require('./setHeaders')
+	// , spriteMaker = require('./spriteMaker')
+	, imgManip = require('./imgManip')
+	, util = require('./util')
+	, setHeaders = require('./setHeaders')
 
 	, config = require('./config')
 
-	, cloud = new Cloud('ws://' + config.cloudHost + ':' + config.cloudPort)
-	, data = new Data(cloud.data.get(config.mtvCloudDataFieldName))
+	// , cloud = new Cloud('ws://' + config.cloudHost + ':' + config.cloudPort)
+	// , data = new Data(cloud.data.get(config.mtvCloudDataFieldName))
 
-	, subscribeObj = {}
+	// , subscribeObj = {}
 
 console.log('starting')
 
@@ -45,6 +45,7 @@ app.use(function (req, res, next) {
 app.use(bodyParser.urlencoded({
 	extended: true
 }))
+
 app.use(expressValidator())
 
 app.get('/:image/:width/:height'
@@ -168,95 +169,95 @@ app.get('/image/:id/:width/:height'
 			})
 	})
 
-app.get('/sprite/:country/:lang/shows/:width/:height'
-	, validateDimensions
-	, cacheForever(false)
-	, makeOut
-	, serveCached
-	, prepare
-	, function (req, res, next) {
-		var p = req.params
-		req.pathToSpriteData = [p.country
-			, p.lang
-			, 'shows'
-		]
-		next()
-	}
-	, requestSprite)
+// app.get('/sprite/:country/:lang/shows/:width/:height'
+// 	, validateDimensions
+// 	, cacheForever(false)
+// 	, makeOut
+// 	, serveCached
+// 	, prepare
+// 	, function (req, res, next) {
+// 		var p = req.params
+// 		req.pathToSpriteData = [p.country
+// 			, p.lang
+// 			, 'shows'
+// 		]
+// 		next()
+// 	}
+// 	, requestSprite)
 
-app.get('/sprite/:country/:lang/episodes/:showId/:seasonId/:width/:height'
-	, validateDimensions
-	, cacheForever(false)
-	, makeOut
-	, serveCached
-	, prepare
-	, function (req, res, next) {
-		var p = req.params
-		req.pathToSpriteData = [p.country
-			, p.lang
-			, 'shows'
-			, p.showId
-			, 'seasons'
-			, p.seasonId
-			, 'episodes'
-		]
-		next()
-	}
-	, requestSprite)
+// app.get('/sprite/:country/:lang/episodes/:showId/:seasonId/:width/:height'
+// 	, validateDimensions
+// 	, cacheForever(false)
+// 	, makeOut
+// 	, serveCached
+// 	, prepare
+// 	, function (req, res, next) {
+// 		var p = req.params
+// 		req.pathToSpriteData = [p.country
+// 			, p.lang
+// 			, 'shows'
+// 			, p.showId
+// 			, 'seasons'
+// 			, p.seasonId
+// 			, 'episodes'
+// 		]
+// 		next()
+// 	}
+// 	, requestSprite)
 
 app.get('*'
 	, function (req, res, next) {
 		invalidRequest(res)
 	})
 
-cloud.on('welcome', function (err) {
-	console.log('cloud welcome')
-})
+// cloud.on('welcome', function (err) {
+// 	console.log('cloud welcome')
+// })
 
-cloud.on('error', function (err) {
-	log.error('cloud error', err)
-})
+// cloud.on('error', function (err) {
+// 	log.error('cloud error', err)
+// })
 
-subscribeObj[config.mtvCloudDataFieldName] =  {
-	$: {
-		$: {
-			shows: {
-				$: {
-					img: true
-					, number: true
-					, seasons: {
-						$: {
-							number: true
-							, episodes: {
-								$: {
-									img: true
-									, number: true
-								}
-							}
-						}
-					}
-				}
-			},
-			channels: {
-				$: {
-					img: true
-					, number: true
-				}
-			}
-		}
-	}
-}
+// subscribeObj[config.mtvCloudDataFieldName] =  {
+// 	$: {
+// 		$: {
+// 			shows: {
+// 				$: {
+// 					img: true
+// 					, number: true
+// 					, seasons: {
+// 						$: {
+// 							number: true
+// 							, episodes: {
+// 								$: {
+// 									img: true
+// 									, number: true
+// 								}
+// 							}
+// 						}
+// 					}
+// 				}
+// 			},
+// 			channels: {
+// 				$: {
+// 					img: true
+// 					, number: true
+// 				}
+// 			}
+// 		}
+// 	}
+// }
 
-cloud.subscribe(subscribeObj)
+// cloud.subscribe(subscribeObj)
 
-data.addListener(listen)
+// data.addListener(listen)
 
-function listen () {
-	console.log("Listen called")
+// function listen () {
+// 	console.log("Listen called")
 	app.listen(config.port);
 	console.log('Listening on port ', config.port);
-	this.removeListener(listen)
-}
+// 	this.removeListener(listen)
+// }
 
 function serveCached (req, res, next) {
 	var filePath = req.out + '.jpg'
@@ -418,25 +419,25 @@ function validateDimensions (req, res, next) {
 	}
 }
 
-function requestSprite (req, res, next) {
-	console.log('requesting sprite')
-	spriteMaker.requestSprite(req.pathToSpriteData
-		, data
-		, req.params
-		, req.tmpDir
-		, req.dimensions
-		, req.out
-		, function (err, spritePath, cb) {
-			if (err) {
-				err.pathToSpriteData = req.pathToSpriteData
-				err.params = err.params
-				log.error('spriteMaker.requestSprite error', err)
-				res.status(err.status).end(JSON.stringify(err, null, " "))
-			} else {
-				console.log("Serving sprite")
-				serve(res, spritePath, req.cacheForever, function (err) {
-					util.cleanup(req.tmpDir)
-				})
-			}
-		})
-}
+// function requestSprite (req, res, next) {
+// 	console.log('requesting sprite')
+// 	spriteMaker.requestSprite(req.pathToSpriteData
+// 		, data
+// 		, req.params
+// 		, req.tmpDir
+// 		, req.dimensions
+// 		, req.out
+// 		, function (err, spritePath, cb) {
+// 			if (err) {
+// 				err.pathToSpriteData = req.pathToSpriteData
+// 				err.params = err.params
+// 				log.error('spriteMaker.requestSprite error', err)
+// 				res.status(err.status).end(JSON.stringify(err, null, " "))
+// 			} else {
+// 				console.log("Serving sprite")
+// 				serve(res, spritePath, req.cacheForever, function (err) {
+// 					util.cleanup(req.tmpDir)
+// 				})
+// 			}
+// 		})
+// }
