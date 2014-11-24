@@ -408,11 +408,21 @@ function validateImgId (req, res, next) {
 
 function validateDimensions (req, res, next) {
 	var errors
+		, widthError = false
+		, heightError = false
 	console.log('validating dimensions')
 	req.checkParams('width', 'width should be an integer').isInt()
 	req.checkParams('height', 'height should be an integer').isInt()
 	errors = req.validationErrors()
-	if (errors) {
+
+	if (parseInt(req.params.width, 10) > config.maxWidth) {
+		widthError = true
+	}
+	if (parseInt(req.params.height, 10) > config.maxHeight) {
+		heightError = true
+	}
+
+	if (errors || widthError || heightError) {
 		res.status(400).end(config.invalidRequestMessage + '\n' + JSON.stringify(errors))
 	} else {
 		next()

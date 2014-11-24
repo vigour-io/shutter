@@ -34,6 +34,9 @@ Forever `sudo npm install -g forever`
     + Check `vigour-img/images/` for available masks and overlays
     + Check `http://www.imagemagick.org/Usage/blur/blur_montage.jpg` for blur arguments radius and sigma (<radius>x<sigma>)
 
+#### Note
+Both width and height have a maximum of 10000
+
 queryString | options | result
 ---|---|---
 smartResize | | Image is resized to the specified dimensions, conserving aspect ratios by cropping around the center. Option is ignored
