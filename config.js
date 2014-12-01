@@ -14,7 +14,7 @@ module.exports = exports = {
 	, cloudPort: 10001
 
 	, mtvCloudDataFieldName: 'mtvData'
-	, port: 80
+	, port: 8000
 	, maxWidth: 10000
 	, maxHeight: 10000
 }
