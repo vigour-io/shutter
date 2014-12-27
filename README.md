@@ -34,6 +34,11 @@ Forever `sudo npm install -g forever`
     + Check `vigour-img/images/` for available masks and overlays
     + Check `http://www.imagemagick.org/Usage/blur/blur_montage.jpg` for blur arguments radius and sigma (<radius>x<sigma>)
 
+
+## Deployment
+
+`docker run -t -i --env IM_CONVERT_PATH=$IM_CONVERT_PATH vigourio/img-server`
+
 #### Note
 Both width and height have a maximum of 10000
 
