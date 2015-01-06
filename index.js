@@ -1,4 +1,5 @@
-var express = require('express')
+var Promise = require('promise')
+	, express = require('express')
 	, bodyParser = require('body-parser')
 	, expressValidator = require('express-validator')
 	, log = require('npmlog')
@@ -14,6 +15,7 @@ var express = require('express')
 	, setHeaders = require('./setHeaders')
 
 	, config = require('./config')
+	, unlink = Promise.denodeify(fs.unlink)
 
 	// , cloud = new Cloud('ws://' + config.cloudHost + ':' + config.cloudPort)
 	// , data = new Data(cloud.data.get(config.mtvCloudDataFieldName))
@@ -47,6 +49,30 @@ app.use(bodyParser.urlencoded({
 }))
 
 app.use(expressValidator())
+
+app.get('/invalidate/*', function (req, res, next) {
+	var paths = {}
+		, stripped = req.originalUrl.slice(1)
+		, target = stripped.slice(stripped.indexOf('/'))
+
+
+	paths.out = config.outDir + '/' + encodeURIComponent(target)
+	if (req.query.url) {
+		paths.original = req.query.url.slice(req.query.url.lastIndexOf('/') + 1)
+	} else {
+		if (target.indexOf("/image/") === 0) {
+			target = target.slice(7)
+			target = target.slice(0, target.indexOf('/'))
+		}
+		paths.original = target
+	}
+	paths.original = config.originalsPath + '/' + paths.original
+	Promise.all(unlink(paths.out + '.jpg'), unlink(paths.out + '.png'), unlink(paths.original))
+		.then(function (results) {
+			// TODO handle exceptions
+			res.end(JSON.stringify(paths, null, 2))
+		})
+})
 
 app.get('/:image/:width/:height'
 	, validateDimensions
