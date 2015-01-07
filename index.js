@@ -22,8 +22,6 @@ var Promise = require('promise')
 
 	// , subscribeObj = {}
 
-console.log('starting')
-
 Object.defineProperty(Error.prototype, 'toJSON', {
     value: function () {
         var alt = {}
@@ -69,8 +67,13 @@ app.get('/invalidate/*', function (req, res, next) {
 	paths.original = config.originalsPath + '/' + paths.original
 	Promise.all(unlink(paths.out + '.jpg'), unlink(paths.out + '.png'), unlink(paths.original))
 		.then(function (results) {
-			// TODO handle exceptions
+			console.log('Erased', paths.out)
+			console.log('Erased', paths.original)
 			res.end(JSON.stringify(paths, null, 2))
+		})
+		.catch(function (reason) {
+			console.error('Failed to remove cache', reason)
+			res.status(500).end("Failed")
 		})
 })
 
