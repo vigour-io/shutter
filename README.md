@@ -34,6 +34,8 @@ Forever `sudo npm install -g forever`
     + Check `vigour-img/images/` for available masks and overlays
     + Check `http://www.imagemagick.org/Usage/blur/blur_montage.jpg` for blur arguments radius and sigma (<radius>x<sigma>)
 
+- Issue a GET request to the following address to remove the corresponding image from cache (both the requested image and the original unmodified download)
+    + `/invalidate/<any of the above>`
 
 ## Deployment
 
