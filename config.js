@@ -17,4 +17,5 @@ module.exports = exports = {
 	, port: 8000
 	, maxWidth: 10000
 	, maxHeight: 10000
+	, minFreeSpace: 0.01
 }

@@ -1,5 +1,10 @@
 var rimraf = require('rimraf')
   , log = require('npmlog')
+  , Promise = require('Promise')
+  , fs = require('vigour-fs')
+  , readdir = Promise.denodeify(fs.readdir)
+  , remove = Promise.denodeify(fs.remove)
+  , path = require('path')
 
 module.exports = exports = {}
 
@@ -13,6 +18,34 @@ exports.cleanup = function (dir) {
       log.error("Can't remove directory " + dir)
     }
   })
+}
+
+exports.empty = function (dir) {
+  return readdir(dir)
+    .catch(function (reason) {
+      log.error("Can't read directory")
+      throw reason
+    })
+    .then(function (files) {
+      var toErase = files.filter(function (item) {
+        return item !== '.gitignore'
+      })
+      return Promise.all(
+        toErase.map(function (item) {
+          var p = path.join(dir
+            , item)
+          return remove(p)
+            .catch(function (reason) {
+              log.error("Can't remove item", p)
+              throw (reason)
+            })
+        })
+      )
+    })
+    .catch(function (reason) {
+      log.error("ARG", reason)
+      throw reason
+    })
 }
 
 exports.httpDate = function (timestamp) {

@@ -3,9 +3,10 @@ var Promise = require('promise')
 	, bodyParser = require('body-parser')
 	, expressValidator = require('express-validator')
 	, log = require('npmlog')
+	, diskspace = require('diskspace')
 
 	// , Cloud = require('vigour-js/browser/network/cloud')
-	// 	.inject(require('vigour-js/browser/network/cloud/datacloud'))
+	//	.inject(require('vigour-js/browser/network/cloud/datacloud'))
 	// , Data = require('vigour-js/data')
 	, fs = require('vigour-fs')
 
@@ -367,21 +368,28 @@ function invalidRequest (res) {
 }
 
 function prepare (req, res, next) {
-	req.tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
-	console.log('creating temp directory')
-	fs.mkdir(req.tmpDir, function (err) {
-		if (err) {
-			err.detail = 'fs.mkdir error'
-			err.path = req.tmpDir
-			res.status(500).end(JSON.stringify(err, null, " "))
-		} else {
-			req.dimensions = {
-				width: req.params.width
-				, height: req.params.height
-			}
-			next()		
-		}
-	})	
+	checkSpace()
+		.catch(function (reason) {
+			log.error("Error checking space or removing files", reason)
+			throw reason
+		})
+		.then(function () {
+			req.tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
+			log.info('creating temp directory')
+			fs.mkdir(req.tmpDir, function (err) {
+				if (err) {
+					err.detail = 'fs.mkdir error'
+					err.path = req.tmpDir
+					res.status(500).end(JSON.stringify(err, null, " "))
+				} else {
+					req.dimensions = {
+						width: req.params.width
+						, height: req.params.height
+					}
+					next()
+				}
+			})
+		})
 }
 
 function validateEffects (req, res, next) {
@@ -459,6 +467,39 @@ function validateDimensions (req, res, next) {
 	} else {
 		next()
 	}
+}
+
+function checkSpace () {
+	return new Promise(function (resolve, reject) {
+		log.info("Checking disk space")
+		diskspace.check('/', function (err, total, free, status) {
+			var percent
+				, msg
+			if (err) {
+				log.error("Error checking disk space", err)
+				reject(err)
+			} else {
+				if (status !== 'READY') {
+					log.warn("Can't get disk space")
+					log.warn("status", status)
+					reject()
+				} else {
+					msg = "Free space left: " + free/total
+							+ " \ 1 AKA ( " + Math.round(100*free/total) + "% )"
+					if (free/total < config.minFreeSpace) {
+						log.warn(msg)
+						log.info("Erasing all cached images")
+						resolve(Promise.all(
+							util.empty(config.originalsPath)
+							, util.empty(config.outDir)))
+					} else {
+						log.info(msg)
+						resolve()
+					}
+				}
+			}
+		})
+	})
 }
 
 // function requestSprite (req, res, next) {
