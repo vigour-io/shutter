@@ -1,6 +1,6 @@
 var rimraf = require('rimraf')
   , log = require('npmlog')
-  , Promise = require('Promise')
+  , Promise = require('promise')
   , fs = require('vigour-fs')
   , readdir = Promise.denodeify(fs.readdir)
   , remove = Promise.denodeify(fs.remove)
