@@ -26,6 +26,7 @@
     "express-validator": "^2.4.0",
     "gm": "^1.16.0",
     "npmlog": "^0.1.1",
+    "promise": "^6.1.0",
     "rimraf": "^2.2.8",
     "vigour-fs": "git+ssh://git@github.com:vigour-io/vigour-fs.git#master",
     "ws": "^0.4.32"
