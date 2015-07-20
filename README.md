@@ -1,28 +1,26 @@
 vigour-img
 ==================
 
-Makes a sprite out of an array of urls
+Image manipulation service
 
-## Dependencies
+## Installation
+### dependencies
 - ImageMagick `brew install ImageMagick` or `sudo yum install ImageMagick`
 - GraphicsMagick `sudo yum install GraphicsMagick`
 - Forever `sudo npm install -g forever`
+- Start an instance of vigour-hub with MTV data, or get the url for an existing one (obsolete soon)
+- In config.js, set cloudHost and cloudPort to point the that hub (obsolete soon)
 
-<a name='api'></a>
-## Usage
-- Start an instance of vigour-hub
-- In **config.js**, set `cloudHost` and `cloudPort` to point the that hub
-- Populate it with MTV data
+### launch
 - Add path to ImageMagick's convert command as environment variable `IM_CONVERT_PATH`, e.g.
     + On EC2 instance: `export IM_CONVERT_PATH=/usr/bin/convert`
     + On my computer: `export IM_CONVERT_PATH=/usr/local/opt/imagemagick/bin/convert`
 - Start the server (`nohup npm start &`)
-- Logging will be available in `nohup.out`
-- Issue a GET request to one of the following addresses to obtain the sprite corresponding to the provided parameters
-    + `/sprite/:country/:lang/shows/:width/:height`
-    + `/sprite/:country/:lang/episodes/:showId/:seasonId/:width/:height`
+
+<a name='api'></a>
+## Usage
 - Issue a GET request to the following address to obtain a single image corresponding to the parameters provided in the route and the query string. 
-    + `/image/:id/:width/:height`, examples:
+    + `/image/:id/:width/:height?effectOptions`, examples:
         * `/image/55f50432fd73e366c69956ad3cb97a59/150/150?effect=tMask&mask=avatarMask`
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=composite&overlay=overlay`
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=mask&mask=logoMask&fillColor=EE255C`
@@ -31,18 +29,20 @@ Makes a sprite out of an array of urls
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=tMask&mask=logoMask`
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=blur&radius=0&sigma=3`
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=overlayBlur&overlay=overlay&radius=0&sigma=3`
+- Issue a GET request to the following address to remove the corresponding image from cache (both the requested image and the original unmodified download)
+    + `/invalidate/<any of the above>`
+
+#### Notes
+    + Both width and height have a maximum of 10000
     + Check `vigour-img/images/` for available masks and overlays
     + Check `http://www.imagemagick.org/Usage/blur/blur_montage.jpg` for blur arguments radius and sigma (<radius>x<sigma>)
 
-- Issue a GET request to the following address to remove the corresponding image from cache (both the requested image and the original unmodified download)
-    + `/invalidate/<any of the above>`
 
 ## Deployment
 
 `docker run -t -i --env IM_CONVERT_PATH=$IM_CONVERT_PATH vigourio/img-server`
 
-#### Note
-Both width and height have a maximum of 10000
+## OBSOLETE SOON
 
 queryString | options | result
 ---|---|---
