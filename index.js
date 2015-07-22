@@ -140,7 +140,7 @@ app.get('/:image/:width/:height'
 			})
 	})
 
-app.get('/:image/:id/:width/:height'
+app.get('/image/:id/:width/:height'
 	, validateDimensions
 	, validateImgId
 	, validateEffects
