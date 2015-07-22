@@ -87,7 +87,9 @@ app.get('/:image/:width/:height'
 	, prepare
 	, function (req, res, next) {
 		var url = req.query.url
-		req.pathToOriginal = config.originalsPath + "/" + req.query.url.slice(req.query.url.lastIndexOf('/') + 1)
+
+		req.pathToOriginal = config.originalsPath + '/' + req.query.url.slice(req.query.url.lastIndexOf('/') + 1)
+
 		fs.exists(req.pathToOriginal, function (exists) {
 			if (exists) {
 				next()
@@ -111,7 +113,7 @@ app.get('/:image/:width/:height'
 							next()
 						}
 					})
-				}		
+				}
 			})
 	}
 	, function (req, res, next) {
@@ -138,7 +140,7 @@ app.get('/:image/:width/:height'
 			})
 	})
 
-app.get('/image/:id/:width/:height'
+app.get('/:image/:id/:width/:height'
 	, validateDimensions
 	, validateImgId
 	, validateEffects
@@ -172,7 +174,7 @@ app.get('/image/:id/:width/:height'
 							next()
 						}
 					})
-				}		
+				}
 			})
 	}
 	, function (req, res, next) {
@@ -347,7 +349,7 @@ function serve (res, path, cacheForever, cb) {
 				console.log("sendFile succeeds", path)
 			}
 			if (cb) {
-				cb(err)	
+				cb(err)
 			}
 		})
 }
