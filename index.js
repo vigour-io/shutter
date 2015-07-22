@@ -36,7 +36,7 @@ Object.defineProperty(Error.prototype, 'toJSON', {
     configurable: true
 })
 
-app = express();
+app = express()
 
 app.use(function (req, res, next) {
   console.log(req.method, req.originalUrl)
@@ -287,8 +287,8 @@ app.get('*'
 
 // function listen () {
 //  console.log("Listen called")
-  app.listen(config.port);
-  console.log('Listening on port ', config.port);
+  app.listen(config.port)
+  console.log('Listening on port ', config.port)
 //  this.removeListener(listen)
 // }
 
