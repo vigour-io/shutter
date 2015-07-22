@@ -449,7 +449,7 @@ function validateImgId (req, res, next) {
 function validateImgURL (req, res, next) {
   var errors
   console.log('validating image URL')
-  req.checkQuery('url', "url should be an URL").isURL()
+  req.checkQuery('url', "id should be an URL").isURL()
   errors = req.validationErrors()
 
   if (errors)
