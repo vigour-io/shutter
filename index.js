@@ -3,7 +3,8 @@ var express = require('express'),
     Promise = require('promise'),
     fs = require('vigour-fs'),
     config = require('./config'),
-    util = require('./util'), setHeaders = require('./setHeaders'),
+    util = require('./util'),
+    setHeaders = require('./setHeaders'),
 
     imgManip = require('./imgManip'),
 
@@ -134,6 +135,7 @@ app.post('/image/',
   prepare,
 
   function(req, res, next) {
+
     if (!req.params) return res.sendStatus(400)
 
     console.log(req.params)
@@ -352,16 +354,21 @@ function imageTransform(req, res, next) {
 function serveCached(req, res, next) {
   var filePath = req.out + '.jpg'
 
-  serveIfExists(filePath, req.cacheForever, res,
-    function(err) {
+  serveIfExists(filePath
+    , req.cacheForever
+    , res
+    , function (err) {
       if (err) {
         filePath = req.out + '.png'
 
-        serveIfExists(filePath, req.cachedForever, res, function(err) {
-          if (err) {
-            next()
-          }
-        })
+        serveIfExists(filePath
+          , req.cachedForever
+          , res
+          , function (err) {
+            if (err) {
+              next()
+            }
+          })
       }
     }
   )
