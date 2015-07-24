@@ -1,16 +1,17 @@
 var Promise = require('promise')
   , express = require('express')
-  , bodyParser = require('body-parser')
   , expressValidator = require('express-validator')
   , log = require('npmlog')
+  , colors = require('colors')
   , diskspace = require('diskspace')
 
   // , Cloud = require('vigour-js/browser/network/cloud')
   //  .inject(require('vigour-js/browser/network/cloud/datacloud'))
   // , Data = require('vigour-js/data')
+  // , spriteMaker = require('./spriteMaker')
+
   , fs = require('vigour-fs')
 
-  // , spriteMaker = require('./spriteMaker')
   , imgManip = require('./imgManip')
   , util = require('./util')
   , setHeaders = require('./setHeaders')
@@ -18,22 +19,29 @@ var Promise = require('promise')
   , config = require('./config')
   , unlink = Promise.denodeify(fs.unlink)
 
+  , bodyParser = require('body-parser')
+  , jsonParser = bodyParser.json()
+
+  , multer = require('multer')
+  , upload = multer({ dest: config.originalsPath + '/' })
+  // , photos = upload.single('photo')
+
   // , cloud = new Cloud('ws://' + config.cloudHost + ':' + config.cloudPort)
   // , data = new Data(cloud.data.get(config.mtvCloudDataFieldName))
 
   // , subscribeObj = {}
 
 Object.defineProperty(Error.prototype, 'toJSON', {
-    value: function () {
-        var alt = {}
+  value: function () {
+    var alt = {}
 
-        Object.getOwnPropertyNames(this).forEach(function (key) {
-            alt[key] = this[key]
-        }, this)
+    Object.getOwnPropertyNames(this).forEach(function (key) {
+      alt[key] = this[key]
+    }, this)
 
-        return alt
-    },
-    configurable: true
+    return alt
+  },
+  configurable: true
 })
 
 app = express()
@@ -43,15 +51,12 @@ app.use(function (req, res, next) {
   next()
 })
 
-app.use(bodyParser.urlencoded({
-  extended: true
-}))
-
 app.use(expressValidator())
 
 app.get('/invalidate/*', function (req, res, next) {
   var paths = {}
     , stripped = req.originalUrl.slice(1)
+
     , target = stripped.slice(stripped.indexOf('/'))
 
 
@@ -78,6 +83,70 @@ app.get('/invalidate/*', function (req, res, next) {
     })
 })
 
+app.get('/', function(req, res){
+  res.send('hello world')
+})
+
+app.post('/image/'
+  , upload.single('photo')
+  , function (req, res, next) {
+
+    log.info('POST request received!'.cyan)
+
+    log.info('Body:')
+    console.log(req.body)
+
+    log.info('File:')
+    console.log(req.file)
+
+    if (!req.body || !req.file) return res.sendStatus(400)
+
+    // that's kinda weird :)
+    req.params = req.query = req.body
+    req.pathToOriginal = config.originalsPath + '/' + req.file.filename
+
+    next()
+  }
+  , validateDimensions
+  , validateEffects
+  , cacheForever(true)
+  , makeOut
+  , prepare
+  , serveCached
+  , function(req, res, next){
+    if (!req.params) return res.sendStatus(400)
+
+    console.log(req.params)
+    console.log(req.file)
+
+    next()
+  }
+  , function (req, res, next) {
+    console.log("Transforming image".green)
+
+    // image manipulation using imageManip
+    imgManip.effect(req.query, req.pathToOriginal, req.dimensions, req.out, function(err, newPath) {
+      if (err) {
+        err.details = "imgManip.effect error"
+        err.query = req.query
+        err.path = req.pathToOriginal
+        err.dimensions = req.dimensions
+        err.out = req.out
+
+        res.status(500).end(JSON.stringify(err, null, " "))
+        util.cleanup(req.tmpDir)
+      } else {
+        console.log("Serving image".green)
+
+        serve(res, newPath, req.cacheForever, function(err) {
+          util.cleanup(req.tmpDir)
+        })
+      }
+    })
+  }
+)
+
+// get and process image from URL
 app.get('/:image/:width/:height'
   , validateDimensions
   , validateImgURL
@@ -91,56 +160,59 @@ app.get('/:image/:width/:height'
 
     req.pathToOriginal = config.originalsPath + '/' + req.query.url.slice(req.query.url.lastIndexOf('/') + 1)
 
-    fs.exists(req.pathToOriginal, function (exists) {
+    fs.exists(req.pathToOriginal, function(exists) {
       if (exists) {
         next()
       } else {
+
         console.log("Downloading original image")
-        fs.writeFile(req.pathToOriginal
-          , url
-          , {
-            maxTries: config.maxTries
-            , retryOn404: true  // MTV's image server sometimes returns 404 even if image does exists, i.e. retrying may work
+
+        fs.writeFile(req.pathToOriginal, url, {
+          maxTries: config.maxTries,
+          retryOn404: true // MTV's image server sometimes returns 404 even if image does exists, i.e. retrying may work
+        }, function(err) {
+          if (err) {
+            err.details = 'vigour-fs.write (download) error'
+            err.path = req.pathToOriginal
+            err.data = url
+            log.error(err.details, err)
+            res.status(500).end(JSON.stringify(err, null, " "))
+            util.cleanup(req.tmpDir)
+          } else {
+            next()
           }
-          , function (err) {
-            if (err) {
-              err.details = 'vigour-fs.write (download) error'
-              err.path = req.pathToOriginal
-              err.data = url
-              log.error(err.details, err)
-              res.status(500).end(JSON.stringify(err, null, " "))
-              util.cleanup(req.tmpDir)
-            } else {
-              next()
-            }
-          })
-        }
-      })
+        })
+
+      }
+    })
   }
   , function (req, res, next) {
     console.log("Transforming image")
-    imgManip.effect(req.query
-      , req.pathToOriginal
-      , req.dimensions
-      , req.out
-      , function (err, newPath) {
-        if (err) {
-          err.details = "imgManip.effect error"
-          err.query = req.query
-          err.path = req.pathToOriginal
-          err.dimensions = req.dimensions
-          err.out = req.out
-          res.status(500).end(JSON.stringify(err, null, " "))
-          util.cleanup(req.tmpDir)
-        } else {
-          console.log("Serving image")
-          serve(res, newPath, req.cacheForever, function (err) {
-            util.cleanup(req.tmpDir)
-          })
-        }
-      })
-  })
 
+    // image manipulation using imageManip
+    imgManip.effect(req.query, req.pathToOriginal, req.dimensions, req.out, function(err, newPath) {
+      if (err) {
+        err.details = "imgManip.effect error"
+        err.query = req.query
+        err.path = req.pathToOriginal
+        err.dimensions = req.dimensions
+        err.out = req.out
+
+        res.status(500).end(JSON.stringify(err, null, " "))
+        util.cleanup(req.tmpDir)
+      } else {
+        console.log("Serving image")
+
+        serve(res, newPath, req.cacheForever, function(err) {
+          util.cleanup(req.tmpDir)
+        })
+      }
+    })
+
+  }
+)
+
+// get and process from MTV Play
 app.get('/image/:id/:width/:height'
   , validateDimensions
   , validateImgId
@@ -185,6 +257,7 @@ app.get('/image/:id/:width/:height'
       , req.dimensions
       , req.out
       , function (err, newPath) {
+
         if (err) {
           err.details = "imgManip.effect error"
           err.query = req.query
@@ -199,6 +272,7 @@ app.get('/image/:id/:width/:height'
             util.cleanup(req.tmpDir)
           })
         }
+
       })
   })
 
@@ -285,12 +359,18 @@ app.get('*'
 
 // data.addListener(listen)
 
-// function listen () {
-//  console.log("Listen called")
+
+function listen () {
+  log.info("Listen called".cyan)
+
   app.listen(config.port)
-  console.log('Listening on port ', config.port)
-//  this.removeListener(listen)
-// }
+  console.log('Listening on port'.gray, config.port)
+
+  // this.removeListener(listen)
+}
+
+listen()
+
 
 function serveCached (req, res, next) {
   var filePath = req.out + '.jpg'
@@ -315,7 +395,7 @@ function serveCached (req, res, next) {
 function serveIfExists (path, cacheForever, res, cb) {
   fs.exists(path, function (exists) {
     if (exists) {
-      console.log('Serving existing file')
+      log.info('Serving existing file'.cyan)
       serve(res, path, cacheForever)
       cb(null)
     } else {
@@ -333,6 +413,7 @@ function cacheForever (bool) {
 
 function serve (res, path, cacheForever, cb) {
   setHeaders(res, cacheForever)
+
   res.sendFile(path
     , {
       root: __dirname
@@ -347,7 +428,7 @@ function serve (res, path, cacheForever, cb) {
           // TODO Warn dev
         }
       } else {
-        console.log("sendFile succeeds", path)
+        log.info("sendFile succeeds".cyan, path.toString().gray)
       }
       if (cb) {
         cb(err)
@@ -356,7 +437,8 @@ function serve (res, path, cacheForever, cb) {
 }
 
 function makeOut (req, res, next) {
-  console.log('making out')
+  log.info('Making out'.cyan)
+
   try {
     req.out = config.outDir + '/' + encodeURIComponent(req.originalUrl)
     next()
@@ -378,7 +460,7 @@ function prepare (req, res, next) {
     })
     .then(function () {
       req.tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
-      log.info('creating temp directory')
+      log.info('creating temp directory'.cyan)
       fs.mkdir(req.tmpDir, function (err) {
         if (err) {
           err.detail = 'fs.mkdir error'
@@ -407,19 +489,25 @@ function validateEffects (req, res, next) {
       , 'smartResize'
     ]
     , fileNameRE = /^[a-zA-Z][\w\.-]*$/
-  console.log('validating effects')
+
+  log.info('validating effects'.cyan)
+
   if (req.query.effect) {
     req.checkQuery('effect', 'effect should be a valid effect').isIn(validEffects)
+
     if (!errors) {
+
       if (~['mask', 'tMask'].indexOf(req.query.effect)) {
         req.checkQuery('mask', "mask should be a valid file name, without the extension").matches(fileNameRE)
         if (req.query.effect === 'mask') {
           req.checkQuery('fillColor', "fillColor should be a valid hexadecimal color").isHexColor()
           req.sanitize('fillColor').blacklist('#')
         }
+
       } else if (~['overlayBlur', 'overlay', 'composite'].indexOf(req.query.effect)) {
         req.checkQuery('overlay', '').matches(fileNameRE)
       }
+
       if (~['overlayBlur', 'blur'].indexOf(req.query.effect)) {
         req.checkQuery('radius', "radius should be an integer").isInt()
         req.checkQuery('sigma', "sigma should be an integer").isInt()
@@ -436,7 +524,7 @@ function validateEffects (req, res, next) {
 
 function validateImgId (req, res, next) {
   var errors
-  console.log('validating image id')
+  log.info('validating image id'.cyan)
   req.checkParams('id', "id should be alphanumeric").isAlphanumeric()
   errors = req.validationErrors()
   if (errors) {
@@ -448,7 +536,7 @@ function validateImgId (req, res, next) {
 
 function validateImgURL (req, res, next) {
   var errors
-  console.log('validating image URL')
+  log.info('validating image URL'.cyan)
   req.checkQuery('url', "id should be an URL").isURL()
   errors = req.validationErrors()
 
@@ -464,11 +552,15 @@ function validateDimensions (req, res, next) {
     , height
     , widthError = false
     , heightError = false
-  console.log('validating dimensions')
+
+  log.info('validating dimensions!'.cyan)
+
   req.checkParams('width', 'width should be an integer').isInt()
   req.checkParams('height', 'height should be an integer').isInt()
+
   errors = req.validationErrors()
   width = parseInt(req.params.width, 10)
+
   if (width > config.maxWidth || width < 1) {
     widthError = true
   }
@@ -486,7 +578,9 @@ function validateDimensions (req, res, next) {
 
 function checkSpace () {
   return new Promise(function (resolve, reject) {
-    log.info("Checking disk space")
+
+    log.info("Checking disk space".cyan)
+
     diskspace.check('/', function (err, total, free, status) {
       var percent
         , msg
@@ -501,6 +595,7 @@ function checkSpace () {
         } else {
           msg = "Free space left: " + free/total
               + " \ 1 AKA ( " + Math.round(100*free/total) + "% )"
+
           if (free/total < config.minFreeSpace) {
             log.warn(msg)
             log.info("Erasing all cached images")

@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/vigour-io/vigour-img",
   "dependencies": {
-    "body-parser": "^1.5.2",
     "cache": "git+ssh://git@github.com:vigour-io/read-through-cache.git#master",
     "diskspace": "^0.1.7",
     "express": "^4.7.4",
@@ -32,6 +31,9 @@
     "ws": "^0.4.32"
   },
   "devDependencies": {
+    "body-parser": "^1.13.2",
+    "colors": "^1.1.2",
+    "multer": "^1.0.1",
     "promise": "^6.0.0"
   },
   "keywords": [
