@@ -109,10 +109,8 @@ app.post('/image/'
   }
   , validateDimensions
   , validateEffects
-  , cacheForever(true)
   , makeOut
   , prepare
-  , serveCached
   , function(req, res, next){
     if (!req.params) return res.sendStatus(400)
 
@@ -374,12 +372,14 @@ listen()
 
 function serveCached (req, res, next) {
   var filePath = req.out + '.jpg'
+
   serveIfExists(filePath
     , req.cacheForever
     , res
     , function (err) {
       if (err) {
         filePath = req.out + '.png'
+
         serveIfExists(filePath
           , req.cachedForever
           , res
