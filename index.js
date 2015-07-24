@@ -155,7 +155,6 @@ app.get('/:image/:width/:height'
   , prepare
   , function (req, res, next) {
     var url = req.query.url
-
     req.pathToOriginal = config.originalsPath + '/' + req.query.url.slice(req.query.url.lastIndexOf('/') + 1)
 
     fs.exists(req.pathToOriginal, function(exists) {
@@ -163,7 +162,7 @@ app.get('/:image/:width/:height'
         next()
       } else {
 
-        console.log("Downloading original image")
+        log.info("Downloading original image".cyan)
 
         fs.writeFile(req.pathToOriginal, url, {
           maxTries: config.maxTries,
@@ -222,6 +221,7 @@ app.get('/image/:id/:width/:height'
   , function (req, res, next) {
     var url = util.urlFromId(req.params.id)
     req.pathToOriginal = config.originalsPath + '/' + req.params.id
+
     fs.exists(req.pathToOriginal, function (exists) {
       if (exists) {
         next()
@@ -249,29 +249,28 @@ app.get('/image/:id/:width/:height'
       })
   }
   , function (req, res, next) {
-    console.log("Transforming image")
-    imgManip.effect(req.query
-      , req.pathToOriginal
-      , req.dimensions
-      , req.out
-      , function (err, newPath) {
 
-        if (err) {
-          err.details = "imgManip.effect error"
-          err.query = req.query
-          err.path = req.pathToOriginal
-          err.dimensions = req.dimensions
-          err.out = req.out
-          res.status(500).end(JSON.stringify(err, null, " "))
+    log.info("Transforming image".cyan)
+
+    imgManip.effect(req.query, req.pathToOriginal, req.dimensions, req.out, function(err, newPath) {
+
+      if (err) {
+        err.details = "imgManip.effect error"
+        err.query = req.query
+        err.path = req.pathToOriginal
+        err.dimensions = req.dimensions
+        err.out = req.out
+        res.status(500).end(JSON.stringify(err, null, " "))
+        util.cleanup(req.tmpDir)
+      } else {
+        console.log("Serving image")
+        serve(res, newPath, req.cacheForever, function(err) {
           util.cleanup(req.tmpDir)
-        } else {
-          console.log("Serving image")
-          serve(res, newPath, req.cacheForever, function (err) {
-            util.cleanup(req.tmpDir)
-          })
-        }
+        })
+      }
 
-      })
+    })
+
   })
 
 // app.get('/sprite/:country/:lang/shows/:width/:height'
