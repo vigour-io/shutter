@@ -36,6 +36,7 @@ var express = require('express'),
     // , subscribeObj = {}
 
 
+
 Object.defineProperty(Error.prototype, 'toJSON', {
   value: function() {
     var alt = {}
