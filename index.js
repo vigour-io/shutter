@@ -87,7 +87,7 @@ app.get('/', function(req, res){
   res.send('hello world')
 })
 
-app.post('/image/'
+app.post('/image'
   , upload.single('photo')
   , function (req, res, next) {
 
