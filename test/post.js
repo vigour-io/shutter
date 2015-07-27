@@ -13,7 +13,6 @@ var http = require('http'),
         }
     }
 
-
 fs.stat(src, function(err, stats) {
     options.headers["Content-Length"] = stats.size
     var req = http.request(options, function(res) {
