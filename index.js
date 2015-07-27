@@ -4,7 +4,7 @@ var Promise = require('promise')
   , expressValidator = require('express-validator')
   , log = require('npmlog')
   , diskspace = require('diskspace')
-
+  , hash = require('vigour-js/util/hash.js')
   // , Cloud = require('vigour-js/browser/network/cloud')
   //  .inject(require('vigour-js/browser/network/cloud/datacloud'))
   // , Data = require('vigour-js/data')
@@ -136,6 +136,9 @@ app.get('/:image/:width/:height'
           console.log("Serving image")
           serve(res, newPath, req.cacheForever, function (err) {
             util.cleanup(req.tmpDir)
+            if (!req.cacheForever) {
+              unlink(newPath)
+            }
           })
         }
       })
@@ -197,6 +200,9 @@ app.get('/image/:id/:width/:height'
           console.log("Serving image")
           serve(res, newPath, req.cacheForever, function (err) {
             util.cleanup(req.tmpDir)
+            if (!req.cacheForever) {
+              unlink(newPath)
+            }
           })
         }
       })
@@ -301,7 +307,7 @@ function serveCached (req, res, next) {
       if (err) {
         filePath = req.out + '.png'
         serveIfExists(filePath
-          , req.cachedForever
+          , req.cacheForever
           , res
           , function (err) {
             if (err) {
@@ -326,7 +332,13 @@ function serveIfExists (path, cacheForever, res, cb) {
 
 function cacheForever (bool) {
   return function (req, res, next) {
-    req.cacheForever = bool
+    if (bool) {
+      if (req.query.cache !== undefined) {
+        req.cacheForever = (req.query.cache === "false") ? false : true
+      } else {
+        req.cacheForever = true
+      }
+    }
     next()
   }
 }
@@ -358,7 +370,7 @@ function serve (res, path, cacheForever, cb) {
 function makeOut (req, res, next) {
   console.log('making out')
   try {
-    req.out = config.outDir + '/' + encodeURIComponent(req.originalUrl)
+    req.out = config.outDir + '/' + hash(req.originalUrl)
     next()
   } catch (e) {
     invalidRequest(res)
