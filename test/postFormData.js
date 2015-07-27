@@ -1,5 +1,4 @@
-var http = require('http')
-	, path = require('path')
+var path = require('path')
 	, FormData = require('form-data')
 	, fs = require('fs')
 	, src = path.join(__dirname, 'imgs', 'canyon.jpg')
