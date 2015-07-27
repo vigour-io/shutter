@@ -29,6 +29,7 @@
     "promise": "^6.1.0",
     "rimraf": "^2.2.8",
     "vigour-fs": "git+ssh://git@github.com:vigour-io/vigour-fs.git#master",
+    "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
     "ws": "^0.4.32"
   },
   "devDependencies": {
