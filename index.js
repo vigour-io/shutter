@@ -11,6 +11,7 @@ var express = require('express'),
     jsonParser = bodyParser.json(),
 
     diskspace = require('diskspace'),
+    hash = require('vigour-js/util/hash.js'),
     multer = require('multer'),
     upload = multer({
       dest: config.originalsPath + '/'
@@ -209,26 +210,33 @@ app.get('/:image/:width/:height',
 
   function(req, res, next) {
     console.log("Transforming image")
-
     // image manipulation using imageManip
-    imgManip.effect(req.query, req.pathToOriginal, req.dimensions, req.out, function(err, newPath) {
-      if (err) {
-        err.details = "imgManip.effect error"
-        err.query = req.query
-        err.path = req.pathToOriginal
-        err.dimensions = req.dimensions
-        err.out = req.out
+    imgManip.effect(
+      req.query,
+      req.pathToOriginal,
+      req.dimensions,
+      req.out,
 
-        res.status(500).end(JSON.stringify(err, null, " "))
-        util.cleanup(req.tmpDir)
-      } else {
-        console.log("Serving image")
-
-        serve(res, newPath, req.cacheForever, function(err) {
+      function (err, newPath) {
+        if (err) {
+          err.details = "imgManip.effect error"
+          err.query = req.query
+          err.path = req.pathToOriginal
+          err.dimensions = req.dimensions
+          err.out = req.out
+          res.status(500).end(JSON.stringify(err, null, " "))
           util.cleanup(req.tmpDir)
-        })
+        } else {
+          console.log("Serving image")
+          serve(res, newPath, req.cacheForever, function (err) {
+            util.cleanup(req.tmpDir)
+            if (!req.cacheForever) {
+              unlink(newPath)
+            }
+          })
+        }
       }
-    })
+    )
   }
 )
 
@@ -269,6 +277,7 @@ app.get('/image/:id/:width/:height',
       }
     })
   },
+
   function(req, res, next) {
     log.info("Transforming image".cyan)
 
@@ -282,14 +291,17 @@ app.get('/image/:id/:width/:height',
         err.out = req.out
         res.status(500).end(JSON.stringify(err, null, " "))
         util.cleanup(req.tmpDir)
+
       } else {
         console.log("Serving image")
-        serve(res, newPath, req.cacheForever, function(err) {
+        serve(res, newPath, req.cacheForever, function (err) {
           util.cleanup(req.tmpDir)
+          if (!req.cacheForever) {
+            unlink(newPath)
+          }
         })
       }
     })
-
   }
 )
 
@@ -385,24 +397,25 @@ function listen() {
 
   // this.removeListener(listen)
 }
-
 listen()
 
 
 function serveCached(req, res, next) {
   var filePath = req.out + '.jpg'
 
-  serveIfExists(filePath, req.cacheForever, res, function(err) {
-    if (err) {
-      filePath = req.out + '.png'
+  serveIfExists(filePath, req.cacheForever, res,
+    function(err) {
+      if (err) {
+        filePath = req.out + '.png'
 
-      serveIfExists(filePath, req.cachedForever, res, function(err) {
-        if (err) {
-          next()
-        }
-      })
+        serveIfExists(filePath, req.cachedForever, res, function(err) {
+          if (err) {
+            next()
+          }
+        })
+      }
     }
-  })
+  )
 }
 
 function serveIfExists(path, cacheForever, res, cb) {
@@ -417,9 +430,15 @@ function serveIfExists(path, cacheForever, res, cb) {
   })
 }
 
-function cacheForever(bool) {
-  return function(req, res, next) {
-    req.cacheForever = bool
+function cacheForever (bool) {
+  return function (req, res, next) {
+    if (bool) {
+      if (req.query.cache !== undefined) {
+        req.cacheForever = (req.query.cache === "false") ? false : true
+      } else {
+        req.cacheForever = true
+      }
+    }
     next()
   }
 }
@@ -451,7 +470,7 @@ function makeOut(req, res, next) {
   log.info('Making out'.cyan)
 
   try {
-    req.out = config.outDir + '/' + encodeURIComponent(req.originalUrl)
+    req.out = config.outDir + '/' + hash(req.originalUrl)
     next()
   } catch (e) {
     invalidRequest(res)
