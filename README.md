@@ -31,7 +31,7 @@ Image manipulation service
         * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=overlayBlur&overlay=overlay&radius=0&sigma=3`
 - Issue a **GET** request to the following address to remove the corresponding image from cache (both the requested image and the original unmodified download)
     + `/invalidate/<any of the above>`
-- To test a **POST** request, you can use this fiddle: [jsbin.com/lemomi/12/](http://jsbin.com/lemomi/12/edit?html,output)
+- To test a **POST** request, you can use this fiddle: [jsbin.com/lemomi/14/](http://jsbin.com/lemomi/14/edit?html,output)
 
 #### Notes
     + Both width and height have a maximum of 10000
