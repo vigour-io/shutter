@@ -142,29 +142,7 @@ app.post('/image/',
     next()
   },
 
-  function(req, res, next) {
-    console.log("Transforming image".green)
-
-    // image manipulation using imageManip
-    imgManip.effect(req.query, req.pathToOriginal, req.dimensions, req.out, function(err, newPath) {
-      if (err) {
-        err.details = "imgManip.effect error"
-        err.query = req.query
-        err.path = req.pathToOriginal
-        err.dimensions = req.dimensions
-        err.out = req.out
-
-        res.status(500).end(JSON.stringify(err, null, " "))
-        util.cleanup(req.tmpDir)
-      } else {
-        console.log("Serving image".green)
-
-        serve(res, newPath, req.cacheForever, function(err) {
-          util.cleanup(req.tmpDir)
-        })
-      }
-    })
-  }
+  imageTransform
 )
 
 // get and process image from the URL
@@ -178,66 +156,14 @@ app.get('/:image/:width/:height',
   prepare,
 
   function(req, res, next) {
-    var url = req.query.url
+    req.url = req.query.url
     req.pathToOriginal = config.originalsPath + '/' + req.query.url.slice(req.query.url.lastIndexOf('/') + 1)
 
-    fs.exists(req.pathToOriginal, function(exists) {
-      if (exists) {
-        next()
-      } else {
-
-        log.info("Downloading original image".cyan)
-
-        fs.writeFile(req.pathToOriginal, url, {
-          maxTries: config.maxTries,
-          retryOn404: true // MTV's image server sometimes returns 404 even if image does exists, i.e. retrying may work
-        }, function(err) {
-          if (err) {
-            err.details = 'vigour-fs.write (download) error'
-            err.path = req.pathToOriginal
-            err.data = url
-            log.error(err.details, err)
-            res.status(500).end(JSON.stringify(err, null, " "))
-            util.cleanup(req.tmpDir)
-          } else {
-            next()
-          }
-        })
-
-      }
-    })
+    next()
   },
 
-  function(req, res, next) {
-    console.log("Transforming image")
-    // image manipulation using imageManip
-    imgManip.effect(
-      req.query,
-      req.pathToOriginal,
-      req.dimensions,
-      req.out,
-
-      function (err, newPath) {
-        if (err) {
-          err.details = "imgManip.effect error"
-          err.query = req.query
-          err.path = req.pathToOriginal
-          err.dimensions = req.dimensions
-          err.out = req.out
-          res.status(500).end(JSON.stringify(err, null, " "))
-          util.cleanup(req.tmpDir)
-        } else {
-          console.log("Serving image")
-          serve(res, newPath, req.cacheForever, function (err) {
-            util.cleanup(req.tmpDir)
-            if (!req.cacheForever) {
-              unlink(newPath)
-            }
-          })
-        }
-      }
-    )
-  }
+  imageDownload,
+  imageTransform
 )
 
 // get and process image from the MTVPlay through it's unique id
@@ -251,58 +177,14 @@ app.get('/image/:id/:width/:height',
   prepare,
 
   function(req, res, next) {
-    var url = util.urlFromId(req.params.id)
+    req.url = util.urlFromId(req.params.id)
     req.pathToOriginal = config.originalsPath + '/' + req.params.id
 
-    fs.exists(req.pathToOriginal, function(exists) {
-      if (exists) {
-        next()
-      } else {
-        console.log("Downloading original image")
-        fs.writeFile(req.pathToOriginal, url, {
-          maxTries: config.maxTries,
-          retryOn404: true // MTV's image server sometimes returns 404 even if image does exists, i.e. retrying may work
-        }, function(err) {
-          if (err) {
-            err.details = 'vigour-fs.write (download) error'
-            err.path = req.pathToOriginal
-            err.data = url
-            log.error(err.details, err)
-            res.status(500).end(JSON.stringify(err, null, " "))
-            util.cleanup(req.tmpDir)
-          } else {
-            next()
-          }
-        })
-      }
-    })
+    next()
   },
 
-  function(req, res, next) {
-    log.info("Transforming image".cyan)
-
-    imgManip.effect(req.query, req.pathToOriginal, req.dimensions, req.out, function(err, newPath) {
-
-      if (err) {
-        err.details = "imgManip.effect error"
-        err.query = req.query
-        err.path = req.pathToOriginal
-        err.dimensions = req.dimensions
-        err.out = req.out
-        res.status(500).end(JSON.stringify(err, null, " "))
-        util.cleanup(req.tmpDir)
-
-      } else {
-        console.log("Serving image")
-        serve(res, newPath, req.cacheForever, function (err) {
-          util.cleanup(req.tmpDir)
-          if (!req.cacheForever) {
-            unlink(newPath)
-          }
-        })
-      }
-    })
-  }
+  imageDownload,
+  imageTransform
 )
 
 // invalid request
@@ -400,6 +282,73 @@ function listen() {
 listen()
 
 
+// download original image
+// to `originals/` directory
+function imageDownload(req, res, next) {
+  console.log('req.pathToOriginal'.red, req.pathToOriginal)
+  console.log('url'.red, req.url)
+
+  fs.exists(req.pathToOriginal, function(exists) {
+    if (exists) {
+      next()
+    } else {
+
+      log.info("Downloading original image".cyan)
+
+      fs.writeFile(req.pathToOriginal, req.url, {
+        maxTries: config.maxTries,
+        retryOn404: true // MTV's image server sometimes returns 404 even if image does exists, i.e. retrying may work
+      }, function(err) {
+        if (err) {
+          err.details = 'vigour-fs.write (download) error'
+          err.path = req.pathToOriginal
+          err.data = req.url
+          log.error(err.details, err)
+          res.status(500).end(JSON.stringify(err, null, " "))
+          util.cleanup(req.tmpDir)
+        } else {
+          next()
+        }
+      })
+
+    }
+  })
+}
+
+// reused image transform for all requests
+function imageTransform(req, res, next) {
+  console.log("Transforming image".green)
+
+  // image manipulation using imageManip
+  imgManip.effect(
+    req.query,
+    req.pathToOriginal,
+    req.dimensions,
+    req.out,
+    function(err, newPath) {
+      if (err) {
+        err.details = "imgManip.effect error"
+        err.query = req.query
+        err.path = req.pathToOriginal
+        err.dimensions = req.dimensions
+        err.out = req.out
+
+        res.status(500).end(
+          JSON.stringify(err, null, " ")
+        )
+        util.cleanup(req.tmpDir)
+      } else {
+        console.log("Serving image".green)
+
+        serve(res, newPath, req.cacheForever, function(err) {
+          util.cleanup(req.tmpDir)
+        })
+      }
+    }
+  )
+}
+
+
 function serveCached(req, res, next) {
   var filePath = req.out + '.jpg'
 
@@ -490,8 +439,9 @@ function prepare(req, res, next) {
     })
     .then(function() {
       req.tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
-      log.info('creating temp directory'.cyan)
+
       fs.mkdir(req.tmpDir, function(err) {
+
         if (err) {
           err.detail = 'fs.mkdir error'
           err.path = req.tmpDir
@@ -564,7 +514,9 @@ function validateImgURL(req, res, next) {
   errors = req.validationErrors()
 
   if (errors)
-    res.status(400).end(config.invalidRequestMessage + '\n' + JSON.stringify(errors))
+    res.status(400).end(
+      config.invalidRequestMessage + '\n' + JSON.stringify(errors)
+    )
   else
     next()
 }
