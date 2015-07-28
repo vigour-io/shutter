@@ -8,10 +8,14 @@
   },
   "main": "./index.js",
   "scripts": {
-    "start": "forever index.js"
+    "test": "gaston test",
+    "start": "forever server.js"
   },
   "engines": {
     "node": ">=0.10.0"
+  },
+  "directories": {
+    "test": "test"
   },
   "description": "Makes a sprite out of an array of urls",
   "bugs": {
@@ -44,5 +48,22 @@
     "sprites",
     "graphicsMagick"
   ],
-  "license": "ISC"
+  "license": "ISC",
+  "gaston": {
+    "port": 8080,
+    "socket-port": 9000,
+    "no-auto-reload": false,
+    "no-package": false,
+    "bundle": "./",
+    "build": "./",
+    "browserify": {
+      "transforms": []
+    },
+    "less": {
+      "options": {}
+    },
+    "remote-logging": false,
+    "require-paths": {},
+    "source-maps": true
+  }
 }
