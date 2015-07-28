@@ -440,8 +440,8 @@ function prepare(req, res, next) {
     .then(function() {
       req.tmpDir = config.tmpDir + '/' + Math.random().toString().slice(1)
 
-      log.info('creating temp directory'.cyan)
       fs.mkdir(req.tmpDir, function(err) {
+
         if (err) {
           err.detail = 'fs.mkdir error'
           err.path = req.tmpDir
