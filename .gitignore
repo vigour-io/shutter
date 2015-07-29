@@ -6,3 +6,6 @@ forever.log
 log.stdout
 log.stderr
 nohup.out
+
+bundle.*
+build.*

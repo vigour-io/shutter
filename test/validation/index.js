@@ -1,8 +1,21 @@
+var validate = require('./validation')
+
+var invalidData = {}
+
 describe('validation', function(){
 
   describe('dimension', function(){
 
     it('should require dimensions on any request', function(){
+
+      var validData = {
+        width: 300,
+        height: 500
+      }
+
+      // validate.dimension(validData)
+
+      // assert(validate.dimension(validData), 're')
 
     })
 

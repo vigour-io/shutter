@@ -1,14 +1,14 @@
 var express = require('express'),
     Promise = require('promise'),
     fs = require('vigour-fs'),
-    config = require('./config'),
-    util = require('./util'),
-    setHeaders = require('./setHeaders'),
+    config = require('./lib/config'),
+    util = require('./lib/util'),
+    setHeaders = require('./lib/setHeaders'),
 
     expressValidator = require('express-validator'),
-    validate = require('./validation'),
+    validate = require('./lib/validation'),
 
-    imgManip = require('./imgManip'),
+    imgManip = require('./lib/imgManip'),
 
     bodyParser = require('body-parser'),
     jsonParser = bodyParser.json(),
@@ -28,7 +28,7 @@ var express = require('express'),
     // , Cloud = require('vigour-js/browser/network/cloud')
     //  .inject(require('vigour-js/browser/network/cloud/datacloud'))
     // , Data = require('vigour-js/data')
-    // , spriteMaker = require('./spriteMaker'),
+    // , spriteMaker = require('./lib/spriteMaker'),
 
 
     // , photos = upload.single('photo')
