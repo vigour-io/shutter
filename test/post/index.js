@@ -1,9 +1,14 @@
-describe('form submitting', function(){
+// var chai = require('chai'),
+//   expect = chai.expect,
+//   should = chai.should()
 
-  it('should process data sent by post request', function(){
+describe('post', function(){
 
-    expect(true).to.equal(true)
+  describe('submit', function(){
 
-  })
+    it('should process data sent by post request', function(){
+
+
+    })
 
 })

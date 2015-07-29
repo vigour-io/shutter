@@ -1,9 +1,12 @@
 var express = require('express'),
-    expressValidator = require('express-validator'),
     Promise = require('promise'),
     fs = require('vigour-fs'),
     config = require('./config'),
-    util = require('./util'), setHeaders = require('./setHeaders'),
+    util = require('./util'),
+    setHeaders = require('./setHeaders'),
+
+    expressValidator = require('express-validator'),
+    validate = require('./validation'),
 
     imgManip = require('./imgManip'),
 
@@ -34,6 +37,9 @@ var express = require('express'),
     // , data = new Data(cloud.data.get(config.mtvCloudDataFieldName))
 
     // , subscribeObj = {}
+
+
+module.exports = exports = {}
 
 
 Object.defineProperty(Error.prototype, 'toJSON', {
@@ -128,8 +134,9 @@ app.post('/image/',
     next()
   },
 
-  validateDimensions,
-  validateEffects,
+  validate.dimensions,
+  validate.effects,
+
   makeOut,
   prepare,
 
@@ -147,9 +154,10 @@ app.post('/image/',
 
 // get and process image from the URL
 app.get('/:image/:width/:height',
-  validateDimensions,
-  validateImgURL,
-  validateEffects,
+  validate.dimensions,
+  validate.imgURL,
+  validate.effects,
+
   cacheForever(true),
   makeOut,
   serveCached,
@@ -168,9 +176,10 @@ app.get('/:image/:width/:height',
 
 // get and process image from the MTVPlay through it's unique id
 app.get('/image/:id/:width/:height',
-  validateDimensions,
-  validateImgId,
-  validateEffects,
+  validate.dimensions,
+  validate.imgId,
+  validate.effects,
+
   cacheForever(true),
   makeOut,
   serveCached,
@@ -193,7 +202,7 @@ app.get('*', function(req, res, next) {
 })
 
 // app.get('/sprite/:country/:lang/shows/:width/:height'
-//  , validateDimensions
+//  , validate.dimensions
 //  , cacheForever(false)
 //  , makeOut
 //  , serveCached
@@ -209,7 +218,7 @@ app.get('*', function(req, res, next) {
 //  , requestSprite)
 
 // app.get('/sprite/:country/:lang/episodes/:showId/:seasonId/:width/:height'
-//  , validateDimensions
+//  , validate.dimensions
 //  , cacheForever(false)
 //  , makeOut
 //  , serveCached
@@ -455,97 +464,6 @@ function prepare(req, res, next) {
         }
       })
     })
-}
-
-function validateEffects(req, res, next) {
-  var errors, validEffects = [
-      'composite', 'mask', 'overlay', 'tMask', 'blur', 'overlayBlur', 'smartResize'
-    ],
-    fileNameRE = /^[a-zA-Z][\w\.-]*$/
-
-  log.info('validating effects'.cyan)
-
-  if (req.query.effect) {
-    req.checkQuery('effect', 'effect should be a valid effect').isIn(validEffects)
-
-    if (!errors) {
-
-      if (~['mask', 'tMask'].indexOf(req.query.effect)) {
-        req.checkQuery('mask', "mask should be a valid file name, without the extension").matches(fileNameRE)
-        if (req.query.effect === 'mask') {
-          req.checkQuery('fillColor', "fillColor should be a valid hexadecimal color").isHexColor()
-          req.sanitize('fillColor').blacklist('#')
-        }
-
-      } else if (~['overlayBlur', 'overlay', 'composite'].indexOf(req.query.effect)) {
-        req.checkQuery('overlay', '').matches(fileNameRE)
-      }
-
-      if (~['overlayBlur', 'blur'].indexOf(req.query.effect)) {
-        req.checkQuery('radius', "radius should be an integer").isInt()
-        req.checkQuery('sigma', "sigma should be an integer").isInt()
-      }
-    }
-  }
-  errors = req.validationErrors()
-  if (errors) {
-    res.status(400).end(config.invalidRequestMessage + '\n' + JSON.stringify(errors))
-  } else {
-    next()
-  }
-}
-
-function validateImgId(req, res, next) {
-  var errors
-  log.info('validating image id'.cyan)
-  req.checkParams('id', "id should be alphanumeric").isAlphanumeric()
-  errors = req.validationErrors()
-  if (errors) {
-    res.status(400).end(config.invalidRequestMessage + '\n' + JSON.stringify(errors))
-  } else {
-    next()
-  }
-}
-
-function validateImgURL(req, res, next) {
-  var errors
-  log.info('validating image URL'.cyan)
-  req.checkQuery('url', "id should be an URL").isURL()
-  errors = req.validationErrors()
-
-  if (errors)
-    res.status(400).end(
-      config.invalidRequestMessage + '\n' + JSON.stringify(errors)
-    )
-  else
-    next()
-}
-
-function validateDimensions(req, res, next) {
-  var errors, width, height, widthError = false,
-    heightError = false
-
-  log.info('validating dimensions!'.cyan)
-
-  req.checkParams('width', 'width should be an integer').isInt()
-  req.checkParams('height', 'height should be an integer').isInt()
-
-  errors = req.validationErrors()
-  width = parseInt(req.params.width, 10)
-
-  if (width > config.maxWidth || width < 1) {
-    widthError = true
-  }
-  height = parseInt(req.params.height, 10)
-  if (height > config.maxHeight || height < 1) {
-    heightError = true
-  }
-
-  if (errors || widthError || heightError) {
-    res.status(400).end(config.invalidRequestMessage + '\n' + JSON.stringify(errors))
-  } else {
-    next()
-  }
 }
 
 function checkSpace() {
