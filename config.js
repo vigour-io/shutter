@@ -24,6 +24,12 @@ config.items =
 		{ def: 10000 }
 	, minFreeSpace:
 		{ def: 0.01 }
+	, convertPath:
+		{ def: "/usr/bin/convert"
+		, env: "IMG_CONVERT_PATH"
+		, cli: "--img-convert-path <path>"
+		, desc: "Path to Image Magick's `convert` executable"
+		}
 	}
 
 config.files =

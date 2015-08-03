@@ -31,6 +31,7 @@ Object.defineProperty(Error.prototype, 'toJSON', {
 module.exports = exports = function (_options) {
   var handle
   options = _options
+  imgManip.init(options)
   app = express();
 
   app.use(function (req, res, next) {

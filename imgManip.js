@@ -1,13 +1,8 @@
 var exec = require('child_process').exec
 	, fs = require('fs')
-	, config = require('./config')
 	, log = require('npmlog')
 	, cwd = process.cwd()
-	, imConvertPath = process.env.IM_CONVERT_PATH
-
-if (!imConvertPath) {
-	throw "Please set environment variable IM_CONVERT_PATH to the location of ImageMagick's `convert`. See README.md for more guidance."
-}
+	, options
 
 function execCommand (command, cb) {
 	console.log('\nExecuting ', command)
@@ -17,6 +12,10 @@ function execCommand (command, cb) {
 }
 
 module.exports = exports = {}
+
+exports.init = function (_options) {
+	options = _options
+}
 
 exports.effect = function (query, subject, dimensions, out, cb) {
 	var effect = (query.effect) ? query.effect : 'smartResize'
@@ -206,7 +205,7 @@ exports.overlayBlur = function (subject, overlay, radius, sigma, dimensions, out
 		, newOut = out + '.jpg'
 		, error
 	if (subject && overlay && radius && sigma && dimensions && out && cb) {
-		execCommand(imConvertPath
+		execCommand(options.convertPath
 			+ " \\( '" + subject + "'"
 			+ " -resize '" + dimensionsString + "^'"
 			+ " -gravity 'Center'"
@@ -241,7 +240,7 @@ exports.overlay = function (subject, overlay, dimensions, out, cb) {
 		, newOut = out + '.jpg'
 		, error
 	if (subject && overlay && dimensions && out && cb) {
-		execCommand(imConvertPath
+		execCommand(options.convertPath
 			+ " \\( '" + subject + "'"
 			+ " -resize '" + dimensionsString + "^'"
 			+ " -gravity 'Center'"
@@ -328,7 +327,7 @@ exports.mask = function (subject, mask, color, dimensions, out, cb) {
 		, newOut = out + '.jpg'
 		, error
 	if (subject && mask && color && dimensions && out && cb) {
-		execCommand(imConvertPath + " -size '" + dimensionsString + "'"
+		execCommand(options.convertPath + " -size '" + dimensionsString + "'"
 			+ " xc:'" + color + "'"
 			+ " \\( "
 				+ " \\( '" + subject + "'"
@@ -368,7 +367,7 @@ exports.tMask = function (subject, mask, dimensions, out, cb) {
 		, newOut = out + '.png'
 		, error
 	if (subject && mask && dimensions && out && cb) {
-		execCommand(imConvertPath
+		execCommand(options.convertPath
 			+ " \\( '" + subject + "'"
 			+ " -resize '" + dimensionsString + "^'"
 			+ " -gravity 'Center'"
@@ -401,7 +400,7 @@ exports.composite = function (subject, overlay, dimensions, out, cb) {
 		, newOut = out + '.png'
 		, error
 	if (subject && overlay && dimensions && out && cb) {
-		execCommand(imConvertPath
+		execCommand(options.convertPath
 			+ " \\( '" + subject + "'"
 			+ " -resize '" + dimensionsString + "^'"
 			+ " -gravity 'Center'"
