@@ -1,36 +1,51 @@
-var http = require('http'),
-    path = require('path'),
-    fs = require('fs'),
-    src = path.join(__dirname, 'imgs', 'canyon.jpg'),
-    width = 900,
-    height = 600,
-    options = {
-        port: 8000,
-        path: '/image',
-        method: 'POST',
-        headers: {
-            "Content-Type": "image/jpeg"
-        }
-    }
+var path = require('path')
+var http = require('http')
+var imgServer = require('../../')
+var sampleImage = path.join(__dirname, '..', 'data', 'sample.jpg')
+var fs = require('vigour-fs')
+var Promise = require('promise')
+var stat = Promise.denodeify(fs.stat)
+var handle
 
-fs.stat(src, function(err, stats) {
-    options.headers["Content-Length"] = stats.size
-    var req = http.request(options, function(res) {
-        console.log("statusCode", res.statusCode)
-        res.on('error', function(err) {
-            console.error("RES FAIL", err)
-        })
-        res.on('data', function(chunk) {
-            console.log('Response: ' + chunk);
-        })
-        res.on('end', function() {
-            console.log('DONE')
-        })
-    })
-    req.on('error', function(err) {
-        console.error("REQ FAIL", err)
-    })
-    fs.createReadStream(src).pipe(req).on('end', function() {
-        req.end()
-    })
+describe("POST /image/:width/:height", function () {
+	before(function (done) {
+		this.timeout(5000)
+		imgServer()
+			.then(function (_handle) {
+				handle = _handle
+				done()
+			})
+	})
+	it("should serve a resized version of the posted image", function (done) {
+		stat(sampleImage)
+			.then(function (stats) {
+				var rs = fs.createReadStream(sampleImage)
+				var req = http.request(
+					{ path: "/image/600/400"
+					, port: 8000
+					, method: "POST"
+					, headers:
+						{ "Content-Length": stats.size
+						, "Content-Type": "image/jpeg"
+						}
+					}
+				, function (res) {
+					res.on('error', function (err) {
+						console.error("err", err, err.stack)
+						expect(err).not.to.exist
+					})
+					expect(res.statusCode).to.equal(200)
+					done()
+				})
+				req.on('error', function (err) {
+					expect(err).not.to.exist
+				})
+				rs.pipe(req).on('error', function (err) {
+					expect(err).not.to.exist
+				})
+			})
+	})
+	after(function () {
+		handle.close()
+	})
 })

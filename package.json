@@ -6,10 +6,11 @@
     "type": "git",
     "url": "https://github.com/vigour-io/vigour-img.git"
   },
-  "main": "./index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "gaston test",
-    "start": "forever server.js"
+    "start": "forever bin/index.js",
+    "test": "gaston tests node"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -33,6 +34,7 @@
     "rimraf": "^2.2.8",
     "vigour-fs": "git+ssh://git@github.com:vigour-io/vigour-fs.git#master",
     "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
+    "pliant": "git+ssh://git@github.com:vigour-io/pliant.git#master",
     "ws": "^0.4.32"
   },
   "devDependencies": {
