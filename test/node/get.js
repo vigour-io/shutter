@@ -7,7 +7,7 @@ var handle
 describe("GET /image/:width/:height", function () {
 	before(function (done) {
 		this.timeout(5000)
-		imgServer({ convertPath: "/usr/local/opt/imagemagick/bin/convert" })
+		imgServer()
 			.then(function (_handle) {
 				handle = _handle
 				done()
