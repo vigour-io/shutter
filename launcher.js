@@ -34,10 +34,10 @@ module.exports = exports = function (_options) {
   imgManip.init(options)
   app = express();
 
-  app.use(function (req, res, next) {
-    console.log(req.method, req.originalUrl)
-    next()
-  })
+  // app.use(function (req, res, next) {
+  //   console.log(req.method, req.originalUrl)
+  //   next()
+  // })
 
   app.use(bodyParser.urlencoded({
     extended: true
@@ -64,8 +64,8 @@ module.exports = exports = function (_options) {
     paths.original = options.originalsPath + '/' + paths.original
     Promise.all(unlink(paths.out + '.jpg'), unlink(paths.out + '.png'), unlink(paths.original))
       .then(function (results) {
-        console.log('Erased', paths.out)
-        console.log('Erased', paths.original)
+        // console.log('Erased', paths.out)
+        // console.log('Erased', paths.original)
         res.end(JSON.stringify(paths, null, 2))
       })
       .catch(function (reason) {
@@ -91,7 +91,7 @@ module.exports = exports = function (_options) {
         if (exists) {
           next()
         } else {
-          console.log("Downloading original image")
+          // console.log("Downloading original image")
           fs.writeFile(req.pathToOriginal
             , url
             , {
@@ -114,7 +114,7 @@ module.exports = exports = function (_options) {
         })
     }
     , function (req, res, next) {
-      console.log("Transforming image")
+      // console.log("Transforming image")
       imgManip.effect(req.query
         , req.pathToOriginal
         , req.dimensions
@@ -129,7 +129,7 @@ module.exports = exports = function (_options) {
             res.status(500).end(JSON.stringify(err, null, " "))
             util.cleanup(req.tmpDir)
           } else {
-            console.log("Serving image")
+            // console.log("Serving image")
             serve(res, newPath, req.cacheForever, function (err) {
               util.cleanup(req.tmpDir)
               if (!req.cacheForever) {
@@ -155,7 +155,7 @@ module.exports = exports = function (_options) {
         if (exists) {
           next()
         } else {
-          console.log("Downloading original image")
+          // console.log("Downloading original image")
           fs.writeFile(req.pathToOriginal
             , url
             , {
@@ -178,7 +178,7 @@ module.exports = exports = function (_options) {
         })
     }
     , function (req, res, next) {
-      console.log("Transforming image")
+      // console.log("Transforming image")
       imgManip.effect(req.query
         , req.pathToOriginal
         , req.dimensions
@@ -193,7 +193,7 @@ module.exports = exports = function (_options) {
             res.status(500).end(JSON.stringify(err, null, " "))
             util.cleanup(req.tmpDir)
           } else {
-            console.log("Serving image")
+            // console.log("Serving image")
             serve(res, newPath, req.cacheForever, function (err) {
               util.cleanup(req.tmpDir)
               if (!req.cacheForever) {
@@ -319,7 +319,7 @@ function serveCached (req, res, next) {
 function serveIfExists (path, cacheForever, res, cb) {
   fs.exists(path, function (exists) {
     if (exists) {
-      console.log('Serving existing file')
+      // console.log('Serving existing file')
       serve(res, path, cacheForever)
       cb(null)
     } else {
@@ -351,13 +351,13 @@ function serve (res, path, cacheForever, cb) {
       if (err) {
         err.message += ": sendFile error"
         if (err.code === "ECONNABORT" && res.statusCode === 304) {
-          log.info('sent 304 for', path)
+          // log.info('sent 304 for', path)
         } else {
           log.error('Error sending file', err)
           // TODO Warn dev
         }
       } else {
-        console.log("sendFile succeeds", path)
+        // console.log("sendFile succeeds", path)
       }
       if (cb) {
         cb(err)
@@ -366,7 +366,7 @@ function serve (res, path, cacheForever, cb) {
 }
 
 function makeOut (req, res, next) {
-  console.log('making out')
+  // console.log('making out')
   try {
     req.out = options.outDir + '/' + hash(req.originalUrl)
     next()
@@ -376,19 +376,19 @@ function makeOut (req, res, next) {
 }
 
 function invalidRequest (res) {
-  console.log('Serving 400')
+  // console.log('Serving 400')
   res.status(400).end(options.invalidRequestMessage)
 }
 
 function prepare (req, res, next) {
-  checkSpace()
-    .catch(function (reason) {
-      log.error("Error checking space or removing files", reason)
-      throw reason
-    })
-    .then(function () {
+  // checkSpace()
+  //   .catch(function (reason) {
+  //     log.error("Error checking space or removing files", reason)
+  //     throw reason
+  //   })
+  //   .then(function () {
       req.tmpDir = options.tmpDir + '/' + Math.random().toString().slice(1)
-      log.info('creating temp directory')
+      // log.info('creating temp directory')
       fs.mkdir(req.tmpDir, function (err) {
         if (err) {
           err.detail = 'fs.mkdir error'
@@ -402,7 +402,7 @@ function prepare (req, res, next) {
           next()
         }
       })
-    })
+    // })
 }
 
 function validateEffects (req, res, next) {
@@ -417,7 +417,7 @@ function validateEffects (req, res, next) {
       , 'smartResize'
     ]
     , fileNameRE = /^[a-zA-Z][\w\.-]*$/
-  console.log('validating effects')
+  // console.log('validating effects')
   if (req.query.effect) {
     req.checkQuery('effect', 'effect should be a valid effect').isIn(validEffects)
     if (!errors) {
@@ -446,7 +446,7 @@ function validateEffects (req, res, next) {
 
 function validateImgId (req, res, next) {
   var errors
-  console.log('validating image id')
+  // console.log('validating image id')
   req.checkParams('id', "id should be alphanumeric").isAlphanumeric()
   errors = req.validationErrors()
   if (errors) {
@@ -458,7 +458,7 @@ function validateImgId (req, res, next) {
 
 function validateImgURL (req, res, next) {
   var errors
-  console.log('validating image URL')
+  // console.log('validating image URL')
   req.checkQuery('url', "id should be an URL").isURL()
   errors = req.validationErrors()
 
@@ -474,7 +474,7 @@ function validateDimensions (req, res, next) {
     , height
     , widthError = false
     , heightError = false
-  console.log('validating dimensions')
+  // console.log('validating dimensions')
   req.checkParams('width', 'width should be an integer').isInt()
   req.checkParams('height', 'height should be an integer').isInt()
   errors = req.validationErrors()
@@ -494,38 +494,38 @@ function validateDimensions (req, res, next) {
   }
 }
 
-function checkSpace () {
-  return new Promise(function (resolve, reject) {
-    log.info("Checking disk space")
-    diskspace.check('/', function (err, total, free, status) {
-      var percent
-        , msg
-      if (err) {
-        log.error("Error checking disk space", err)
-        reject(err)
-      } else {
-        if (status !== 'READY') {
-          log.warn("Can't get disk space")
-          log.warn("status", status)
-          reject()
-        } else {
-          msg = "Free space left: " + free/total
-              + " \ 1 AKA ( " + Math.round(100*free/total) + "% )"
-          if (free/total < options.minFreeSpace) {
-            log.warn(msg)
-            log.info("Erasing all cached images")
-            resolve(Promise.all(
-              util.empty(options.originalsPath)
-              , util.empty(options.outDir)))
-          } else {
-            log.info(msg)
-            resolve()
-          }
-        }
-      }
-    })
-  })
-}
+// function checkSpace () {
+//   return new Promise(function (resolve, reject) {
+//     // log.info("Checking disk space")
+//     diskspace.check('/', function (err, total, free, status) {
+//       var percent
+//         , msg
+//       if (err) {
+//         log.error("Error checking disk space", err)
+//         reject(err)
+//       } else {
+//         if (status !== 'READY') {
+//           log.warn("Can't get disk space")
+//           log.warn("status", status)
+//           reject()
+//         } else {
+//           msg = "Free space left: " + free/total
+//               + " \ 1 AKA ( " + Math.round(100*free/total) + "% )"
+//           if (free/total < options.minFreeSpace) {
+//             log.warn(msg)
+//             log.info("Erasing all cached images")
+//             resolve(Promise.all(
+//               util.empty(options.originalsPath)
+//               , util.empty(options.outDir)))
+//           } else {
+//             log.info(msg)
+//             resolve()
+//           }
+//         }
+//       }
+//     })
+//   })
+// }
 
 // function requestSprite (req, res, next) {
 //  console.log('requesting sprite')

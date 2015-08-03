@@ -2,19 +2,12 @@ var exec = require('child_process').exec
 	, fs = require('fs')
 	, log = require('npmlog')
 	, cwd = process.cwd()
-	, options
-
-function execCommand (command, cb) {
-	console.log('\nExecuting ', command)
-	exec(command
-		, { cwd: cwd }
-		, cb)
-}
+	, opts
 
 module.exports = exports = {}
 
 exports.init = function (_options) {
-	options = _options
+	opts = _options
 }
 
 exports.effect = function (query, subject, dimensions, out, cb) {
@@ -22,13 +15,14 @@ exports.effect = function (query, subject, dimensions, out, cb) {
 	try {
 		exports.effects[effect](subject, query, dimensions, out, cb)
 	} catch (e) {
-		e.message += ": " + config.invalidRequestMessage
+		e.message += ": " + opts.invalidRequestMessage
 		e.effect = effect
 		cb(e)
 	}
 }
 
 exports.effects = {}
+
 exports.effects.smartResize = function (subject, ignored, dimensions, out, cb) {
 	var dimensionsString = dimensions.width + "x" + dimensions.height
 		, newOut = out + '.jpg'
@@ -205,7 +199,7 @@ exports.overlayBlur = function (subject, overlay, radius, sigma, dimensions, out
 		, newOut = out + '.jpg'
 		, error
 	if (subject && overlay && radius && sigma && dimensions && out && cb) {
-		execCommand(options.convertPath
+		execCommand(opts.convertPath
 			+ " \\( '" + subject + "'"
 			+ " -resize '" + dimensionsString + "^'"
 			+ " -gravity 'Center'"
@@ -240,7 +234,7 @@ exports.overlay = function (subject, overlay, dimensions, out, cb) {
 		, newOut = out + '.jpg'
 		, error
 	if (subject && overlay && dimensions && out && cb) {
-		execCommand(options.convertPath
+		execCommand(opts.convertPath
 			+ " \\( '" + subject + "'"
 			+ " -resize '" + dimensionsString + "^'"
 			+ " -gravity 'Center'"
@@ -327,7 +321,7 @@ exports.mask = function (subject, mask, color, dimensions, out, cb) {
 		, newOut = out + '.jpg'
 		, error
 	if (subject && mask && color && dimensions && out && cb) {
-		execCommand(options.convertPath + " -size '" + dimensionsString + "'"
+		execCommand(opts.convertPath + " -size '" + dimensionsString + "'"
 			+ " xc:'" + color + "'"
 			+ " \\( "
 				+ " \\( '" + subject + "'"
@@ -367,7 +361,7 @@ exports.tMask = function (subject, mask, dimensions, out, cb) {
 		, newOut = out + '.png'
 		, error
 	if (subject && mask && dimensions && out && cb) {
-		execCommand(options.convertPath
+		execCommand(opts.convertPath
 			+ " \\( '" + subject + "'"
 			+ " -resize '" + dimensionsString + "^'"
 			+ " -gravity 'Center'"
@@ -400,7 +394,7 @@ exports.composite = function (subject, overlay, dimensions, out, cb) {
 		, newOut = out + '.png'
 		, error
 	if (subject && overlay && dimensions && out && cb) {
-		execCommand(options.convertPath
+		execCommand(opts.convertPath
 			+ " \\( '" + subject + "'"
 			+ " -resize '" + dimensionsString + "^'"
 			+ " -gravity 'Center'"
@@ -524,4 +518,11 @@ exports.assembleSprites = function (images, out, cb) {
 		}
 		cb(error)
 	}
+}
+
+function execCommand (command, cb) {
+	// console.log('\nExecuting ', command)
+	exec(command
+		, { cwd: cwd }
+		, cb)
 }
