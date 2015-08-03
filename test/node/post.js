@@ -10,18 +10,11 @@ var handle
 describe("POST /image/:width/:height", function () {
 	before(function (done) {
 		this.timeout(5000)
-		console.log('imgServer', typeof imgServer, imgServer)
-		try{
-		imgServer()
+		imgServer({ convertPath: "/usr/local/opt/imagemagick/bin/convert" })
 			.then(function (_handle) {
 				handle = _handle
 				done()
 			})
-		} catch (e) {
-			console.log('haha error wut', e.stack)
-		}
-		
-		
 	})
 	it("should serve a resized version of the posted image", function (done) {
 		stat(sampleImage)

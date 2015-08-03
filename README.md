@@ -6,7 +6,6 @@ Image manipulation service
 ## Installation
 ### dependencies
 - ImageMagick `brew install ImageMagick` or `sudo yum install ImageMagick`
-- GraphicsMagick `sudo yum install GraphicsMagick`
 - Forever `sudo npm install -g forever`
 - Start an instance of vigour-hub with MTV data, or get the url for an existing one (obsolete soon)
 - In config.js, set cloudHost and cloudPort to point the that hub (obsolete soon)
