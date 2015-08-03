@@ -462,10 +462,11 @@ function validateImgURL (req, res, next) {
   req.checkQuery('url', "id should be an URL").isURL()
   errors = req.validationErrors()
 
-  if (errors)
+  if (errors) {
     res.status(400).end(options.invalidRequestMessage + '\n' + JSON.stringify(errors))
-  else
+  } else {
     next()
+  }
 }
 
 function validateDimensions (req, res, next) {
