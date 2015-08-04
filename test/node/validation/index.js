@@ -1,4 +1,4 @@
-var validate = require('./validation')
+var validate = require('../validation')
 
 var invalidData = {}
 
