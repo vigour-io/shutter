@@ -45,7 +45,9 @@ describe("POST /image/:width/:height", function () {
 				})
 			})
 	})
-	after(function () {
-		handle.close()
+	after(function (done) {
+		handle.close(function () {
+			done()
+		})
 	})
 })

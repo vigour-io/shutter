@@ -1,10 +1,11 @@
 var http = require('http')
 var imgServer = require('../../')
-var sampleImage = "http://cdn.myfancyhouse.com/wp-content/uploads/2012/11/The-Grandiose-Margi-boutique-hotel-in-Vouliameni.-Athens-21.jpg"
+var sampleImage = "https://upload.wikimedia.org/wikipedia/commons/8/8c/JPEG_example_JPG_RIP_025.jpg"
 var encoded = encodeURIComponent(sampleImage)
 var base = "/image/600/400?url=" + encoded
 var handle
-describe("GET /image/:width/:height", function () {
+
+describe("Routes", function () {
 	before(function (done) {
 		this.timeout(5000)
 		imgServer()
@@ -13,25 +14,33 @@ describe("GET /image/:width/:height", function () {
 				done()
 			})
 	})
-	describe("Effects", function () {
-		var effects =
-			[ ""
-			, "&effect=smartResize"
-			, "&effect=composite&overlay=overlay"
-			, "&effect=blur&radius=0&sigma=3"
-			, "&effect=tMask&mask=avatarMask"
-			, "&effect=mask&mask=logoMask&fillColor=EE255C"
-			, "&effect=overlay&overlay=overlay"
-			, "&effect=tMask&mask=logoMask"
-			, "&effect=overlayBlur&overlay=overlay&radius=0&sigma=3"
-			]
-		effects.map(function (effect) {
-			var fullPath = base + effect
-			it("`" + effect + "`", attempt(fullPath))
-		})
+	describe("GET /image/:width/:height", function () {
+		describe("Effects", function () {
+			var effects =
+				[ ""
+				, "&effect=smartResize"
+				, "&effect=composite&overlay=overlay"
+				, "&effect=blur&radius=0&sigma=3"
+				, "&effect=tMask&mask=avatarMask"
+				, "&effect=mask&mask=logoMask&fillColor=EE255C"
+				, "&effect=overlay&overlay=overlay"
+				, "&effect=tMask&mask=logoMask"
+				, "&effect=overlayBlur&overlay=overlay&radius=0&sigma=3"
+				]
+			effects.map(function (effect) {
+				var fullPath = base + effect
+				it("`" + effect + "`", attempt(fullPath))
+			})
+		})	
 	})
-	after(function () {
-		handle.close()
+	describe("GET /image/:id/:width/:height", function () {
+		it("should find the correct image and serve a resized version"
+			, attempt("/image/310b69fb4db50d3fc4374d2365cdc93a/900/600"))
+	})
+	after(function (done) {
+		handle.close(function () {
+			done()
+		})
 	})
 })
 
@@ -42,11 +51,20 @@ function attempt (fullPath) {
 			, port: 8000
 			}
 		, function (res) {
+			var total = ""
 			res.on('error', function (err) {
 				expect(err).not.to.exist
 				done()
 			})
 			expect(res.statusCode).to.equal(200)
+			if (res.statusCode !== 200) {
+				res.on('data', function (chunk) {
+					total += chunk
+				})
+				res.on('end', function () {
+					console.log("RESULT", total)
+				})
+			}
 			done()
 		})
 		req.on('error', function (err) {
