@@ -10,6 +10,7 @@ var handle
 
 describe("POST /image/:width/:height", function () {
 	var base = "/image/600/400?"
+	// var base = "http://shawn.vigour.io:8040/image/600/400?"
 	var effects =
 		[ ""
 		, "&effect=smartResize"
