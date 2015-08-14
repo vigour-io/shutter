@@ -8,7 +8,6 @@
   },
   "main": "./lib/index.js",
   "scripts": {
-    "test": "gaston test",
     "start": "forever bin/index.js",
     "test": "gaston tests node",
     "clean": "./bin/index.js -x"
