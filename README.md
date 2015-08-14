@@ -13,12 +13,12 @@ Image manipulation service
 
 
 #### Notes
-    + Both width and height have a maximum of 10000
-    + Check `vigour-img/images/` for available masks and overlays
-    + Check `http://www.imagemagick.org/Usage/blur/blur_montage.jpg` for blur arguments radius and sigma (<radius>x<sigma>)
+- Both width and height have a maximum of 10000
+- Check https://github.com/vigour-io/vigour-img/tree/master/images for available masks and overlays
+- Check http://www.imagemagick.org/Usage/blur/blur_montage.jpg for blur arguments radius and sigma (<radius>x<sigma>)
 
 #### Effects
-See `test/node/post.js`
+See `test/node/post.js` and `test/node/get.js`
 
 ## Installation
 ### dependencies
