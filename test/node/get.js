@@ -3,7 +3,10 @@ var imgServer = require('../../')
 var sampleImage = "https://upload.wikimedia.org/wikipedia/commons/8/8c/JPEG_example_JPG_RIP_025.jpg"
 var encoded = encodeURIComponent(sampleImage)
 var base = "/image/600/400?cache=false&url=" + encoded
+var host = "localhost"
+// var host = "shawn.vigour.io"
 var port = 8000
+// var port = 8040
 var handle
 
 describe("Routes", function () {
@@ -50,7 +53,7 @@ function attempt (fullPath) {
 		var reqOptions =
 			{ path: fullPath
 			, port: port
-			// , hostname: "shawn.vigour.io"
+			, hostname: host
 			}
 		// console.log("reqOptions", reqOptions)
 		var req = http.request(reqOptions
