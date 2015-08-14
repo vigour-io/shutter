@@ -11,9 +11,9 @@ Image manipulation service
 - In config.js, set cloudHost and cloudPort to point the that hub (obsolete soon)
 
 ### launch
-- Add path to ImageMagick's convert command as environment variable `IM_CONVERT_PATH`, e.g.
-    + On EC2 instance: `export IM_CONVERT_PATH=/usr/bin/convert`
-    + On my computer: `export IM_CONVERT_PATH=/usr/local/opt/imagemagick/bin/convert`
+- Add path to ImageMagick's convert command as environment variable `IMG_CONVERT_PATH`, e.g.
+    + On EC2 instance: `export IMG_CONVERT_PATH=/usr/bin/convert`
+    + On my computer: `export IMG_CONVERT_PATH=/usr/local/opt/imagemagick/bin/convert`
 - Start the server (`nohup npm start &`)
 
 <a name='api'></a>
@@ -41,7 +41,7 @@ Image manipulation service
 
 ## Deployment
 
-`docker run -t -i --env IM_CONVERT_PATH=$IM_CONVERT_PATH vigourio/img-server`
+`docker run -t -i --env IMG_CONVERT_PATH=$IMG_CONVERT_PATH vigourio/img-server`
 
 ## OBSOLETE SOON
 
