@@ -5,25 +5,20 @@ Image manipulation service
 
 <a name='api'></a>
 ## Usage
-- Issue a **GET** request to the following address to obtain a single image corresponding to the parameters provided in the route and the query string.
-    + `/image/:id/:width/:height?effectOptions`, examples:
-        * `/image/55f50432fd73e366c69956ad3cb97a59/150/150?effect=tMask&mask=avatarMask`
-        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=composite&overlay=overlay`
-        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=mask&mask=logoMask&fillColor=EE255C`
-        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=overlay&overlay=overlay`
-        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210` (equivalent to `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=smartResize`)
-        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=tMask&mask=logoMask`
-        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=blur&radius=0&sigma=3`
-        * `/image/55f50432fd73e366c69956ad3cb97a59/370/210?effect=overlayBlur&overlay=overlay&radius=0&sigma=3`
-- Issue a **GET** request to the following address to remove the corresponding image from cache (both the requested image and the original unmodified download)
-    + `/invalidate/<any of the above>`
-- To test a **POST** request, you can use this fiddle: [jsbin.com/lemomi/14/](http://jsbin.com/lemomi/14/edit?html,output)
+- POST an image to `/image/:width/:height` (see `test/node/post.js`)
+- GET `/image/:width/:height?url=<SOURCE_IMAGE_URL>` (see `test/node/get.js`)
+- GET `/invalidate/<any of the above>` : Removes the corresponding image from cache (both the requested image and the original unmodified download or posted file)
+- In all cases, add `&cache=false` if you don't want the resulting image to be cached on the server.
+- (*Obsolete*) GET `/image/:id/:width/:height`
 
 
 #### Notes
     + Both width and height have a maximum of 10000
     + Check `vigour-img/images/` for available masks and overlays
     + Check `http://www.imagemagick.org/Usage/blur/blur_montage.jpg` for blur arguments radius and sigma (<radius>x<sigma>)
+
+#### Effects
+See `test/node/post.js`
 
 ## Installation
 ### dependencies
