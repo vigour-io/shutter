@@ -9,7 +9,7 @@ var hash = require('vigour-js/util/hash.js')
 var handle
 
 describe("POST /image/:width/:height", function () {
-	var base = "/image/600/400?"
+	var base = "/image/600/400?cache=false"
 	// var base = "http://shawn.vigour.io:8040/image/600/400?"
 	var effects =
 		[ ""
