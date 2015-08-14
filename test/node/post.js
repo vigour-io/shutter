@@ -35,7 +35,17 @@ describe("POST /image/:width/:height", function () {
 						expect(err).not.to.exist
 					})
 					expect(res.statusCode).to.equal(200)
-					done()
+					var out = path.join(__dirname, 'out', '1')
+					var ws = fs.createWriteStream(out)
+					res.pipe(ws)
+					res.on('error', function (err) {
+						console.error("NOOOO", err)
+						expect(true).to.equal(false)
+					})
+					res.on('end', function () {
+						expect(true).to.equal(true)
+						done()	
+					})
 				})
 				req.on('error', function (err) {
 					expect(err).not.to.exist
