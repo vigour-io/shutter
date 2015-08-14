@@ -3,19 +3,6 @@ vigour-img
 
 Image manipulation service
 
-## Installation
-### dependencies
-- ImageMagick `brew install ImageMagick` or `sudo yum install ImageMagick`
-- Forever `sudo npm install -g forever`
-- Start an instance of vigour-hub with MTV data, or get the url for an existing one (obsolete soon)
-- In config.js, set cloudHost and cloudPort to point the that hub (obsolete soon)
-
-### launch
-- Add path to ImageMagick's convert command as environment variable `IMG_CONVERT_PATH`, e.g.
-    + On EC2 instance: `export IMG_CONVERT_PATH=/usr/bin/convert`
-    + On my computer: `export IMG_CONVERT_PATH=/usr/local/opt/imagemagick/bin/convert`
-- Start the server (`nohup npm start &`)
-
 <a name='api'></a>
 ## Usage
 - Issue a **GET** request to the following address to obtain a single image corresponding to the parameters provided in the route and the query string.
@@ -37,6 +24,19 @@ Image manipulation service
     + Both width and height have a maximum of 10000
     + Check `vigour-img/images/` for available masks and overlays
     + Check `http://www.imagemagick.org/Usage/blur/blur_montage.jpg` for blur arguments radius and sigma (<radius>x<sigma>)
+
+## Installation
+### dependencies
+- ImageMagick `brew install ImageMagick` or `sudo yum install ImageMagick`
+- Forever `sudo npm install -g forever`
+- Start an instance of vigour-hub with MTV data, or get the url for an existing one (obsolete soon)
+- In config.js, set cloudHost and cloudPort to point the that hub (obsolete soon)
+
+### launch
+- Add path to ImageMagick's convert command as environment variable `IMG_CONVERT_PATH`, e.g.
+    + On EC2 instance: `export IMG_CONVERT_PATH=/usr/bin/convert`
+    + On my computer: `export IMG_CONVERT_PATH=/usr/local/opt/imagemagick/bin/convert`
+- Start the server (`nohup npm start &`)
 
 
 ## Deployment
