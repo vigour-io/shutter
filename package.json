@@ -44,8 +44,7 @@
     "colors": "^1.1.2",
     "form-data": "^0.2.0",
     "github-markdown-css": "^2.0.9",
-    "marked": "^0.3.3",
-    "multer": "^1.0.1"
+    "marked": "^0.3.3"
   },
   "keywords": [
     "javascript",

@@ -31,7 +31,7 @@ describe("Routes", function () {
 				var fullPath = base + effect
 				it("`" + effect + "`", attempt(fullPath))
 			})
-		})	
+		})
 	})
 	describe("GET /image/:id/:width/:height", function () {
 		it("should find the correct image and serve a resized version"
@@ -56,16 +56,25 @@ function attempt (fullPath) {
 				expect(err).not.to.exist
 				done()
 			})
-			expect(res.statusCode).to.equal(200)
 			if (res.statusCode !== 200) {
 				res.on('data', function (chunk) {
-					total += chunk
+					console.log("CHUNK", chunk.toString())
 				})
 				res.on('end', function () {
-					console.log("RESULT", total)
+					expect(true).to.equal(false)
 				})
+			} else {
+				expect(res.statusCode).to.equal(200)
+				if (res.statusCode !== 200) {
+					res.on('data', function (chunk) {
+						total += chunk
+					})
+					res.on('end', function () {
+						console.log("RESULT", total)
+					})
+				}
+				done()
 			}
-			done()
 		})
 		req.on('error', function (err) {
 			expect(err).not.to.exist
