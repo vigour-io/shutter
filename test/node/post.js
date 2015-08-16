@@ -9,7 +9,7 @@ var hash = require('vigour-js/util/hash.js')
 var handle
 
 describe("POST /image/:width/:height", function () {
-	var base = "/image/600/400?cache=false"
+	var base = "/image/600/400?"
 	// var base = "http://shawn.vigour.io:8040/image/600/400?"
 	var effects =
 		[ ""
@@ -25,7 +25,7 @@ describe("POST /image/:width/:height", function () {
 
 	before(function (done) {
 		this.timeout(5000)
-		imgServer()
+		imgServer({clean:false})	// TODO Why is this necessary #pliant-bug
 			.then(function (_handle) {
 				handle = _handle
 				done()
