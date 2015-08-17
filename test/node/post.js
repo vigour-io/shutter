@@ -25,7 +25,7 @@ describe("POST /image/:width/:height", function () {
 
 	before(function (done) {
 		this.timeout(5000)
-		imgServer({clean:false})	// TODO Why is this necessary #pliant-bug
+		imgServer()
 			.then(function (_handle) {
 				handle = _handle
 				done()
