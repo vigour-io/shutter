@@ -38,7 +38,9 @@ See `test/node/post.js` and `test/node/get.js`
 
 `docker run -t -i --env IMG_CONVERT_PATH=$IMG_CONVERT_PATH vigourio/img-server`
 
-## OBSOLETE SOON
+----
+
+## OBSOLETE
 
 queryString | options | result
 ---|---|---
