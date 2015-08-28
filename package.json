@@ -51,6 +51,10 @@
     "sprites",
     "graphicsMagick"
   ],
+  "contributors": [{
+    "name": "Shawn Inder",
+    "email": "shawninder@gmail.com"
+  }],
   "license": "ISC",
   "gaston": {
     "port": 8080,
