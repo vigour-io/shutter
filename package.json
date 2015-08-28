@@ -9,7 +9,7 @@
   "main": "./lib/index.js",
   "scripts": {
     "start": "forever bin/index.js",
-    "test": "gaston tests node",
+    "test": "./node_modules/.bin/gaston test node",
     "clean": "./bin/index.js -x"
   },
   "engines": {
@@ -35,6 +35,7 @@
     "vigour-fs": "git+ssh://git@github.com:vigour-io/vigour-fs.git#master",
     "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
     "pliant": "git+ssh://git@github.com:vigour-io/pliant.git#master",
+    "gaston": "git+ssh://git@github.com:vigour-io/gaston.git#dev",
     "ws": "^0.4.32"
   },
   "devDependencies": {
