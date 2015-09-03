@@ -17,7 +17,8 @@ describe('Manip', function () {
       done()
     })
   })
-  it('should reach the remote server if ImageMagick is not installed'
+
+  it('should perform an array or manipulations'
   , function () {
     this.timeout(20000)
     var srcPath = path.join(__dirname, '..', 'data', 'sample.jpg')
@@ -37,4 +38,29 @@ describe('Manip', function () {
         expect(val).to.be.an.array
       })
   })
+
+  // it('should preform batch operations'
+  // , function () {
+  //   this.timeout(20000)
+  //   var srcPath = path.join(__dirname, '..', 'data', 'sample.jpg')
+  //   var dstOne = path.join(__dirname, 'out', 'one.png')
+  //   var dstTwo = path.join(__dirname, 'out', 'two.png')
+  //   return imgServer({
+  //     convertPath: 'haha',
+  //     remote: 'localhost',
+  //     remotePort: '8000',
+  //     manip: [{
+  //       src: srcPath,
+  //       batch: [{
+  //         dst: dstOne,
+  //         width: 200,
+  //         height: 200
+  //       }, {
+  //         dst: dstTwo,
+  //         width: 250,
+  //         height: 250
+  //       }]
+  //     }]
+  //   })
+  // })
 })
