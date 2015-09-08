@@ -3,4 +3,4 @@ var pliant = require('pliant')
 var start = require('../lib/launcher')
 var config = require('../lib/config')
 
-pliant.bin(start, config)
+pliant.bin(config, start)
