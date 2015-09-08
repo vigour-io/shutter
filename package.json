@@ -36,15 +36,15 @@
     "vjs": "git+ssh://git@github.com:vigour-io/vjs.git#master",
     "pliant": "git+ssh://git@github.com:vigour-io/pliant.git#master",
     "gaston": "^0.13.1",
-    "ws": "^0.4.32"
+    "ws": "^0.4.32",
+    "marked": "^0.3.3"
   },
   "devDependencies": {
     "body-parser": "^1.13.2",
     "chai": "^3.2.0",
     "colors": "^1.1.2",
     "form-data": "^0.2.0",
-    "github-markdown-css": "^2.0.9",
-    "marked": "^0.3.3"
+    "github-markdown-css": "^2.0.9"
   },
   "keywords": [
     "javascript",
