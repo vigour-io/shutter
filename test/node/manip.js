@@ -1,9 +1,6 @@
 /* global describe, it, expect, before, after */
 
 var path = require('path')
-var Promise = require('promise')
-var fs = require('vigour-fs')
-var unlink = Promise.denodeify(fs.unlink)
 var imgServer = require('../../')
 var handle
 var srcPath = path.join(__dirname, '..', 'data', 'sample.jpg')
@@ -12,6 +9,7 @@ var outPath_two = path.join(__dirname, 'out', 'hoho.png')
 
 describe('Manip', function () {
   before(function () {
+    console.log('before')
     this.timeout(5000)
     return imgServer()
       .then(function (_handle) {
@@ -24,6 +22,18 @@ describe('Manip', function () {
     })
   })
 
+  it('should succeed immediately if no manipulations are provided'
+  , function () {
+    return imgServer({
+      convertPath: 'forceUseOfRemote',
+      remote: 'localhost',
+      remotePort: '8000',
+      manip: []
+    }).then(function (val) {
+        expect(val).to.be.an.array
+      })
+  })
+
   it('should perform an array or manipulations'
   , function () {
     // afterEach(function () {
@@ -34,7 +44,7 @@ describe('Manip', function () {
     // })
     this.timeout(20000)
     return imgServer({
-      convertPath: 'haha',
+      convertPath: 'forceUseOfRemote',
       remote: 'localhost',
       remotePort: '8000',
       manip: [{

@@ -10,6 +10,10 @@ var writeFile = Promise.denodeify(fs.writeFile)
 var sampleImage = 'https://upload.wikimedia.org/wikipedia/commons/8/8c/JPEG_example_JPG_RIP_025.jpg'
 var encoded = encodeURIComponent(sampleImage)
 var base = '/image/600/400?url=' + encoded
+var baseWidthHeight = '/image?width=600&height=400&url=' + encoded
+// var baseWH = '/image?w=600&h=400&url=' + encoded
+// var baseDimensions = '/image?dimensions=600x400&url=' + encoded
+// var baseD = '/image?d=600x400&url=' + encoded
 var host = 'localhost'
 var port = 8000
 var handle
@@ -46,8 +50,10 @@ describe('Routes', function () {
         done()
       })
   })
+
   describe('GET /image/:width/:height', function () {
     describe('Effects', function () {
+      this.timeout(5000)
       var effects =
         [ '',
         '&effect=smartResize',
@@ -73,8 +79,36 @@ describe('Routes', function () {
     })
   })
 
+  describe('GET /image', function () {
+    describe('?width=600&height=400', function () {
+      var effects =
+        [ '',
+        '&effect=smartResize',
+        '&effect=composite&overlay=overlay',
+        '&effect=blur&radius=0&sigma=3',
+        '&effect=tMask&mask=avatarMask',
+        '&effect=mask&mask=logoMask&fillColor=EE255C',
+        '&effect=overlay&overlay=overlay',
+        '&effect=tMask&mask=logoMask',
+        '&effect=overlayBlur&overlay=overlay&radius=0&sigma=3'
+        ]
+      var png = effects.map(function (item) {
+        return item + '&outType=png'
+      })
+      var jpg = effects.map(function (item) {
+        return item + '&outType=jpg'
+      })
+      var attempts = effects.concat(png, jpg)
+      attempts.map(function (effect) {
+        var fullPath = baseWidthHeight + effect
+        it('`' + effect + '`', attempt(fullPath))
+      })
+    })
+  })
+
   // TODO Obsolete this
   describe('GET /image/:id/:width/:height', function () {
+    this.timeout(30000)
     it('should find the correct image and serve a resized version'
       , attempt('/image/310b69fb4db50d3fc4374d2365cdc93a/900/600'))
   })
@@ -114,11 +148,13 @@ function expectCachedFiles (bool) {
     .then(check)
 
   function check (files) {
-    // Don't forget to account for .gitignore
+    var important = files.filter(function (item) {
+      return item !== '.gitignore' && item !== '.DS_Store'
+    })
     if (bool) {
-      expect(files.length).to.be.gt(1)
+      expect(important.length).to.be.gt(0)
     } else {
-      expect(files.length).to.equal(1)
+      expect(important.length).to.equal(0)
     }
   }
 }

@@ -44,17 +44,20 @@
     "chai": "^3.2.0",
     "colors": "^1.1.2",
     "form-data": "^0.2.0",
-    "github-markdown-css": "^2.0.9"
+    "github-markdown-css": "^2.0.9",
+    "lodash": "^3.10.1"
   },
   "keywords": [
     "javascript",
     "sprites",
     "graphicsMagick"
   ],
-  "contributors": [{
-    "name": "Shawn Inder",
-    "email": "shawninder@gmail.com"
-  }],
+  "contributors": [
+    {
+      "name": "Shawn Inder",
+      "email": "shawninder@gmail.com"
+    }
+  ],
   "license": "ISC",
   "gaston": {
     "port": 8080,

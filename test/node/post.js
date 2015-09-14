@@ -51,6 +51,48 @@ describe('POST /image/:width/:height', function () {
   })
 })
 
+describe('POST /image', function () {
+  var base = '/image?width=600&height=400&cache=false'
+  // var base = "http://shawn.vigour.io:8040/image/600/400?"
+  var effects =
+    [ '',
+    '&effect=smartResize',
+    '&effect=composite&overlay=overlay',
+    '&effect=blur&radius=0&sigma=3',
+    '&effect=tMask&mask=avatarMask',
+    '&effect=mask&mask=logoMask&fillColor=EE255C',
+    '&effect=overlay&overlay=overlay',
+    '&effect=tMask&mask=logoMask',
+    '&effect=overlayBlur&overlay=overlay&radius=0&sigma=3'
+    ]
+  var png = effects.map(function (item) {
+    return item + '&outType=png'
+  })
+  var jpg = effects.map(function (item) {
+    return item + '&outType=jpg'
+  })
+  var attempts = effects.concat(png, jpg)
+
+  before(function (done) {
+    this.timeout(5000)
+    imgServer()
+      .then(function (_handle) {
+        handle = _handle
+        done()
+      })
+  })
+
+  attempts.map(function (effect) {
+    var fullPath = base + effect
+    it(effect, attempt(fullPath, effect))
+  })
+  after(function (done) {
+    handle.close(function () {
+      done()
+    })
+  })
+})
+
 function attempt (fullPath, effect) {
   return function () {
     return stat(sampleImage)
