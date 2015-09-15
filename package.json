@@ -28,16 +28,17 @@
     "diskspace": "^0.1.7",
     "express": "^4.7.4",
     "express-validator": "^2.4.0",
+    "gaston": "^0.13.1",
     "gm": "^1.16.0",
+    "marked": "^0.3.3",
     "npmlog": "^0.1.1",
+    "pliant": "git+ssh://git@github.com:vigour-io/pliant.git#master",
     "promise": "^6.1.0",
+    "query-string": "^2.4.1",
     "rimraf": "^2.2.8",
     "vigour-fs": "^2.0.0",
     "vjs": "git+ssh://git@github.com:vigour-io/vjs.git#master",
-    "pliant": "git+ssh://git@github.com:vigour-io/pliant.git#master",
-    "gaston": "^0.13.1",
-    "ws": "^0.4.32",
-    "marked": "^0.3.3"
+    "ws": "^0.4.32"
   },
   "devDependencies": {
     "body-parser": "^1.13.2",
