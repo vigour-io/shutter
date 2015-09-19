@@ -6,7 +6,7 @@ var clone = require('lodash/lang/clone')
 var imgServer = require('../../')
 var handle
 
-var srcPath = path.join(__dirname, '..', 'data', 'sample.jpg')
+var srcPath = path.join(__dirname, '..', 'data', 'sam ple.jpg')
 var outDir = path.join(__dirname, 'out')
 
 describe('batch (timeout: 5min)', function () {

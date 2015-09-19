@@ -3,7 +3,7 @@
 var path = require('path')
 var imgServer = require('../../')
 var handle
-var srcPath = path.join(__dirname, '..', 'data', 'sample.jpg')
+var srcPath = path.join(__dirname, '..', 'data', 'sam ple.jpg')
 var outPath = path.join(__dirname, 'out', 'haha.png')
 var outPath_two = path.join(__dirname, 'out', 'hoho.png')
 

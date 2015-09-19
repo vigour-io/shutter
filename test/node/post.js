@@ -3,7 +3,7 @@
 var path = require('path')
 var http = require('http')
 var imgServer = require('../../')
-var sampleImage = path.join(__dirname, '..', 'data', 'sample.jpg')
+var sampleImage = path.join(__dirname, '..', 'data', 'sam ple.jpg')
 var fs = require('vigour-fs')
 var Promise = require('promise')
 var stat = Promise.denodeify(fs.stat)
