@@ -32,12 +32,12 @@
     "gm": "^1.16.0",
     "marked": "^0.3.3",
     "npmlog": "^0.1.1",
-    "pliant": "git+ssh://git@github.com:vigour-io/pliant.git#master",
+    "pliant": "git+ssh://git@github.com:vigour-io/pliant.git#develop",
     "promise": "^6.1.0",
     "query-string": "^2.4.1",
     "rimraf": "^2.2.8",
-    "vigour-fs": "^2.0.0",
-    "vjs": "git+ssh://git@github.com:vigour-io/vjs.git#master",
+    "vigour-fs": "^3.0.0",
+    "vjs": "git+ssh://git@github.com:vigour-io/vjs.git#develop",
     "ws": "^0.4.32"
   },
   "devDependencies": {
