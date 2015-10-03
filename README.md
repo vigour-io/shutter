@@ -1,4 +1,4 @@
-vigour-img
+shutter
 ==================
 
 Image manipulation service
@@ -14,7 +14,7 @@ Image manipulation service
 
 #### Notes
 - Both width and height have a maximum of 10000
-- Check https://github.com/vigour-io/vigour-img/tree/master/images for available masks and overlays
+- Check https://github.com/vigour-io/shutter/tree/master/images for available masks and overlays
 - Check http://www.imagemagick.org/Usage/blur/blur_montage.jpg for blur arguments radius and sigma (<radius>x<sigma>)
 
 #### Effects
