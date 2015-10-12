@@ -9,7 +9,7 @@
   "main": "./lib/index.js",
   "scripts": {
     "start": "forever bin/index.js",
-    "test": "gaston test -r node",
+    "test": "gaston test -r node -s ./test/node",
     "clean": "./bin/index.js -x"
   },
   "engines": {
