@@ -28,7 +28,6 @@
     "diskspace": "^0.1.7",
     "express": "^4.7.4",
     "express-validator": "^2.4.0",
-    "gaston": "^0.13.1",
     "gm": "^1.16.0",
     "marked": "^0.3.3",
     "npmlog": "^0.1.1",
