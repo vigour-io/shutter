@@ -1,6 +1,9 @@
 #!/usr/bin/env node
-var pliant = require('pliant')
-var start = require('../lib/launcher')
-var config = require('../lib/config')
+'use strict'
 
-pliant.bin(config, start)
+var Config = require('vigour-js/lib/config')
+var config = new Config()
+var Service = require('../')
+
+var service = new Service(config)
+service.start()

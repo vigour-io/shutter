@@ -1,8 +1,8 @@
-/* global describe, it, beforeEach, before, after, expect */
+'use strict'
 
 var path = require('path')
 var http = require('http')
-var imgServer = require('../../')
+var Shutter = require('../../')
 var fs = require('vigour-fs/lib/server')
 var Promise = require('promise')
 var readdir = Promise.denodeify(fs.readdir)
@@ -32,7 +32,8 @@ describe('Clean', function () {
   it('should clean `out/` and `originals/`', function (done) {
     expectCachedFiles(true)
       .then(function () {
-        return imgServer({ clean: true })
+        var shutter = new Shutter({ clean: true })
+        return shutter.start()
       })
       .then(function () {
         return expectCachedFiles(false)
@@ -44,7 +45,8 @@ describe('Clean', function () {
 describe('Routes', function () {
   before(function (done) {
     this.timeout(5000)
-    imgServer()
+    var shutter = new Shutter()
+    shutter.start()
       .then(function (_handle) {
         handle = _handle
         done()
@@ -119,7 +121,8 @@ describe('Routes', function () {
   //       .done(done)
   //   })
   //   it('should be disabled by `&cache=false`', function (done) {
-  //     imgServer({ clean: true })
+  //     var shutter = new Shutter({ clean: true })
+  //     shutter.start()
   //       .then(function () {
   //         attempt(base + '&cache=false')(function () {
   //           // Give it time to clean up

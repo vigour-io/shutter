@@ -1,3 +1,5 @@
+'use strict'
+
 document.addEventListener('deviceready', start, false)
 
 function start () {

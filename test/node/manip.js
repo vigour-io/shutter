@@ -1,7 +1,7 @@
-/* global describe, it, expect, before, after */
+'use strict'
 
 var path = require('path')
-var imgServer = require('../../')
+var Shutter = require('../../')
 var handle
 var srcPath = path.join(__dirname, '..', 'data', 'sam ple.jpg')
 var outPath = path.join(__dirname, 'out', 'haha.png')
@@ -11,7 +11,8 @@ describe('Manip', function () {
   before(function () {
     console.log('before')
     this.timeout(5000)
-    return imgServer()
+    var shutter = new Shutter()
+    return shutter.start()
       .then(function (_handle) {
         handle = _handle
       })
@@ -24,12 +25,14 @@ describe('Manip', function () {
 
   it('should succeed immediately if no manipulations are provided'
   , function () {
-    return imgServer({
+    var shutter = new Shutter({
       convertPath: 'forceUseOfRemote',
       remote: 'localhost',
       remotePort: '8000',
       manip: []
-    }).then(function (val) {
+    })
+    return shutter.start()
+      .then(function (val) {
         expect(val).to.be.an.array
       })
   })
@@ -43,7 +46,7 @@ describe('Manip', function () {
     //     })
     // })
     this.timeout(20000)
-    return imgServer({
+    var shutter = new Shutter({
       convertPath: 'forceUseOfRemote',
       remote: 'localhost',
       remotePort: '8000',
@@ -59,6 +62,7 @@ describe('Manip', function () {
         height: 250
       }]
     })
+    return shutter.start()
       .then(function (val) {
         expect(val).to.be.an.array
       })
@@ -67,7 +71,7 @@ describe('Manip', function () {
   it('should preform batch operations'
   , function () {
     this.timeout(20000)
-    return imgServer({
+    var shutter = new Shutter({
       convertPath: 'haha',
       remote: 'localhost',
       remotePort: '8000',
@@ -84,5 +88,6 @@ describe('Manip', function () {
         }]
       }]
     })
+    return shutter.start()
   })
 })
