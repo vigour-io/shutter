@@ -1,9 +1,9 @@
-/* global describe, it, expect, before, after */
+'use strict'
 
 var path = require('path')
 var flatten = require('lodash/array/flatten')
 var clone = require('lodash/lang/clone')
-var imgServer = require('../../')
+var Shutter = require('../../')
 var handle
 
 var srcPath = path.join(__dirname, '..', 'data', 'sam ple.jpg')
@@ -12,7 +12,8 @@ var outDir = path.join(__dirname, 'out')
 describe('batch (timeout: 5min)', function () {
   this.timeout(5 * 60 * 1000)
   before(function () {
-    return imgServer()
+    var shutter = new Shutter()
+    return shutter.start()
       .then(function (_handle) {
         handle = _handle
       })
@@ -25,7 +26,7 @@ describe('batch (timeout: 5min)', function () {
 
   it('post'
   , function () {
-    var sizes = [250/*, 500, 1000, 5000*/]
+    var sizes = [250]
     var effects = [
       {},
       { effect: 'smartResize' },
@@ -95,7 +96,8 @@ describe('batch (timeout: 5min)', function () {
       remotePort: '8000'
     }
 
-    return imgServer(obj)
+    var shutter = new Shutter(obj)
+    shutter.start()
       .then(function (val) {
         expect(val).to.be.an.array
       })

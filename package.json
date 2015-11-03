@@ -31,12 +31,11 @@
     "gm": "^1.16.0",
     "marked": "^0.3.3",
     "npmlog": "^0.1.1",
-    "pliant": "git+ssh://git@github.com:vigour-io/pliant.git#develop",
     "promise": "^6.1.0",
     "query-string": "^2.4.1",
     "rimraf": "^2.2.8",
-    "vigour-fs": "^3.0.0",
-    "vjs": "git+ssh://git@github.com:vigour-io/vjs.git#develop",
+    "vigour-fs-promised": "^2.0.0",
+    "vigour-js": "^0.2.2",
     "ws": "^0.4.32"
   },
   "devDependencies": {
@@ -72,5 +71,73 @@
     "remote-logging": false,
     "require-paths": {},
     "source-maps": true
+  },
+  "vigour": {
+    "maxCols": {
+      "val": 10
+    },
+    "maxTries": {
+      "val": 6
+    },
+    "invalidRequestMessage": {
+      "val": "Invalid request. Make sure you are respecting the sprite maker api (https://github.com/vigour-io/shutter/blob/master/README.md#user-content-api) and that the requested data exists."
+    },
+    "port": {
+      "val": 8000,
+      "env": "IMG_PORT",
+      "description": "Port on which the server should listen"
+    },
+    "maxWidth": {
+      "val": 10000
+    },
+    "maxHeight": {
+      "val": 10000
+    },
+    "minFreeSpace": {
+      "val": 0.01
+    },
+    "convertPath": {
+      "val": "/usr/bin/convert",
+      "env": "IMG_CONVERT_PATH",
+      "description": "Path to Image Magick's `convert` executable"
+    },
+    "clean": {
+      "val": false,
+      "description": "Removes all downloaded originals, produced images and temporary folders and files, then exits"
+    },
+    "manip": {
+      "val": false
+    },
+    "verbose": {
+      "val": false,
+      "env": "IMG_VERBOSE",
+      "description": "Logs successful requests"
+    },
+    "remote": {
+      "def": "img.vigour.io",
+      "descriptin": "url for the remote image server to use for image manipulations"
+    },
+    "remotePort": {
+      "val": 80,
+      "description": "port on which to reach the remote image server"
+    }
+  },
+  "standard": {
+    "globals": [
+      "describe",
+      "it",
+      "expect",
+      "before",
+      "after",
+      "beforeEach",
+      "afterEach",
+      "sinon"
+    ]
+  },
+  "services": {
+    "sentinel": {
+      "branches": [],
+      "unignoreFolders": []
+    }
   }
 }

@@ -1,8 +1,8 @@
-/* global describe, it, expect, before, after */
+'use strict'
 
 var path = require('path')
 var http = require('http')
-var imgServer = require('../../')
+var Shutter = require('../../')
 var sampleImage = path.join(__dirname, '..', 'data', 'sam ple.jpg')
 var fs = require('vigour-fs/lib/server')
 var Promise = require('promise')
@@ -31,12 +31,12 @@ describe('POST /image/:width/:height', function () {
   })
   var attempts = effects.concat(png, jpg)
 
-  before(function (done) {
+  before(function () {
     this.timeout(5000)
-    imgServer()
+    var shutter = new Shutter()
+    return shutter.start()
       .then(function (_handle) {
         handle = _handle
-        done()
       })
   })
 
@@ -73,12 +73,12 @@ describe('POST /image', function () {
   })
   var attempts = effects.concat(png, jpg)
 
-  before(function (done) {
+  before(function () {
     this.timeout(5000)
-    imgServer()
+    var shutter = new Shutter()
+    return shutter.start()
       .then(function (_handle) {
         handle = _handle
-        done()
       })
   })
 

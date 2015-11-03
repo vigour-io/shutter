@@ -1,7 +1,7 @@
-/* global describe, it, expect, before, after */
+'use strict'
 
 var http = require('http')
-var imgServer = require('../../')
+var Shutter = require('../../')
 var imgHandle
 var express = require('express')
 var server = express()
@@ -21,7 +21,8 @@ describe('Errors', function () {
       finish()
     })
 
-    imgServer({ maxTries: 2 })
+    var shutter = new Shutter({ maxTries: 2 })
+    imgHandle = shutter.start()
       .then(function (_imgHandle) {
         imgHandle = _imgHandle
         i = true
