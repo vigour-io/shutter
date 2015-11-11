@@ -9,7 +9,6 @@ var outPath_two = path.join(__dirname, 'out', 'hoho.png')
 
 describe('Manip', function () {
   before(function () {
-    console.log('before')
     this.timeout(5000)
     var shutter = new Shutter()
     return shutter.start()
@@ -23,7 +22,7 @@ describe('Manip', function () {
     })
   })
 
-  it('should succeed immediately if no manipulations are provided'
+  it.skip('should succeed immediately if no manipulations are provided'
   , function () {
     var shutter = new Shutter({
       convertPath: 'forceUseOfRemote',
