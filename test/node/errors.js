@@ -68,18 +68,18 @@ describe('Errors', function () {
   })
 
   after(function (done) {
-    var s = false
-    var i = false
+    var serverClosed = false
+    var imgServerClosed = false
     serverHandle.close(function () {
-      s = true
+      serverClosed = true
       finish()
     })
     imgHandle.close(function () {
-      i = true
+      imgServerClosed = true
       finish()
     })
     function finish () {
-      if (s && i) {
+      if (serverClosed && imgServerClosed) {
         done()
       }
     }
