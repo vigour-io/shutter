@@ -18,7 +18,7 @@
   "directories": {
     "test": "test"
   },
-  "description": "Makes a sprite out of an array of urls",
+  "_description": "Makes a sprite out of an array of urls",
   "bugs": {
     "url": "https://github.com/vigour-io/shutter/issues"
   },
@@ -85,7 +85,7 @@
     "port": {
       "val": 8000,
       "env": "IMG_PORT",
-      "description": "Port on which the server should listen"
+      "_description": "Port on which the server should listen"
     },
     "maxWidth": {
       "val": 10000
@@ -99,27 +99,25 @@
     "convertPath": {
       "val": "/usr/bin/convert",
       "env": "IMG_CONVERT_PATH",
-      "description": "Path to Image Magick's `convert` executable"
+      "_description": "Path to Image Magick's `convert` executable"
     },
     "clean": {
       "val": false,
-      "description": "Removes all downloaded originals, produced images and temporary folders and files, then exits"
+      "_description": "Removes all downloaded originals, produced images and temporary folders and files, then exits"
     },
-    "manip": {
-      "val": false
-    },
+    "manip": {},
     "verbose": {
       "val": false,
       "env": "IMG_VERBOSE",
-      "description": "Logs successful requests"
+      "_description": "Logs successful requests"
     },
     "remote": {
-      "def": "img.vigour.io",
-      "descriptin": "url for the remote image server to use for image manipulations"
+      "val": "img.vigour.io",
+      "_description": "url for the remote image server to use for image manipulations"
     },
     "remotePort": {
       "val": 80,
-      "description": "port on which to reach the remote image server"
+      "_description": "port on which to reach the remote image server"
     }
   },
   "standard": {
