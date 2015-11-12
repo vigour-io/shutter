@@ -22,7 +22,7 @@ describe('Manip', function () {
     })
   })
 
-  it.skip('should succeed immediately if no manipulations are provided'
+  it('should succeed immediately if no manipulations are provided'
   , function () {
     var shutter = new Shutter({
       convertPath: 'forceUseOfRemote',

@@ -13,13 +13,16 @@ describe('batch (timeout: 5min)', function () {
   this.timeout(5 * 60 * 1000)
   before(function () {
     var shutter = new Shutter()
+    console.log('A++++++++++')
     return shutter.start()
       .then(function (_handle) {
         handle = _handle
       })
   })
   after(function (done) {
+    console.log('A-----------')
     handle.close(function () {
+      console.log('A.............')
       done()
     })
   })
@@ -97,8 +100,10 @@ describe('batch (timeout: 5min)', function () {
     }
 
     var shutter = new Shutter(obj)
+    console.log('B*************')
     shutter.start()
       .then(function (val) {
+        console.log('B...............')
         expect(val).to.be.an.array
       })
   })

@@ -33,9 +33,11 @@ describe('Clean', function () {
     expectCachedFiles(true)
       .then(function () {
         var shutter = new Shutter({ clean: true })
+        console.log('E**************')
         return shutter.start()
       })
       .then(function () {
+        console.log('E..............')
         return expectCachedFiles(false)
       })
       .done(done)
@@ -46,6 +48,7 @@ describe('Routes', function () {
   before(function (done) {
     this.timeout(5000)
     var shutter = new Shutter()
+    console.log('F+++++++++++++++')
     shutter.start()
       .then(function (_handle) {
         handle = _handle
@@ -115,28 +118,30 @@ describe('Routes', function () {
       , attempt('/image/310b69fb4db50d3fc4374d2365cdc93a/900/600'))
   })
 
-  // describe('Caching', function () {
-  //   it('should be enabled by default', function (done) {
-  //     expectCachedFiles(true)
-  //       .done(done)
-  //   })
-  //   it('should be disabled by `&cache=false`', function (done) {
-  //     var shutter = new Shutter({ clean: true })
-  //     shutter.start()
-  //       .then(function () {
-  //         attempt(base + '&cache=false')(function () {
-  //           // Give it time to clean up
-  //           setTimeout(function () {
-  //             expectCachedFiles(false)
-  //               .done(done)
-  //           }, 1000)
-  //         })
-  //       })
-  //   })
-  // })
+  describe('Caching', function () {
+    it('should be enabled by default', function (done) {
+      expectCachedFiles(true)
+        .done(done)
+    })
+    it('should be disabled by `&cache=false`', function (done) {
+      var shutter = new Shutter({ clean: true })
+      shutter.start()
+        .then(function () {
+          attempt(base + '&cache=false')(function () {
+            // Give it time to clean up
+            setTimeout(function () {
+              expectCachedFiles(false)
+                .done(done)
+            }, 1000)
+          })
+        })
+    })
+  })
 
   after(function (done) {
+    console.log('F--------------')
     handle.close(function () {
+      console.log('F...............')
       done()
     })
   })

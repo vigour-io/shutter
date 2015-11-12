@@ -16,12 +16,14 @@ describe('Errors', function () {
     var s = false
     var i = false
     this.timeout(5000)
+    console.log('C++++++++++++')
     serverHandle = server.listen(serverPort, function () {
       s = true
       finish()
     })
 
     var shutter = new Shutter({ maxTries: 2 })
+    console.log('D+++++++++++')
     imgHandle = shutter.start()
       .then(function (_imgHandle) {
         imgHandle = _imgHandle
@@ -70,11 +72,15 @@ describe('Errors', function () {
   after(function (done) {
     var serverClosed = false
     var imgServerClosed = false
+    console.log('C------------')
     serverHandle.close(function () {
+      console.log('C...............')
       serverClosed = true
       finish()
     })
+    console.log('D-------------')
     imgHandle.close(function () {
+      console.log('D.................')
       imgServerClosed = true
       finish()
     })
