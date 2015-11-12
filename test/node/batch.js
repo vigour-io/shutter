@@ -97,7 +97,7 @@ describe('batch (timeout: 5min)', function () {
     }
 
     var shutter = new Shutter(obj)
-    shutter.start()
+    return shutter.start()
       .then(function (val) {
         expect(val).to.be.an.array
       })
