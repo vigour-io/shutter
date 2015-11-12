@@ -115,25 +115,26 @@ describe('Routes', function () {
       , attempt('/image/310b69fb4db50d3fc4374d2365cdc93a/900/600'))
   })
 
-  // describe('Caching', function () {
-  //   it('should be enabled by default', function (done) {
-  //     expectCachedFiles(true)
-  //       .done(done)
-  //   })
-  //   it('should be disabled by `&cache=false`', function (done) {
-  //     var shutter = new Shutter({ clean: true })
-  //     shutter.start()
-  //       .then(function () {
-  //         attempt(base + '&cache=false')(function () {
-  //           // Give it time to clean up
-  //           setTimeout(function () {
-  //             expectCachedFiles(false)
-  //               .done(done)
-  //           }, 1000)
-  //         })
-  //       })
-  //   })
-  // })
+  describe('Caching', function () {
+    it('should be enabled by default', function (done) {
+      expectCachedFiles(true)
+        .done(done)
+    })
+    it('should be disabled by `&cache=false`', function (done) {
+      var shutter = new Shutter({ clean: true })
+      shutter.start()
+        .then(function () {
+          attempt(base + '&cache=false')()
+            .then(function () {
+              // Give it time to clean up
+              setTimeout(function () {
+                expectCachedFiles(false)
+                  .done(done)
+              }, 1000)
+            })
+        })
+    })
+  })
 
   after(function (done) {
     handle.close(function () {
