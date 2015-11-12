@@ -18,7 +18,7 @@
   "directories": {
     "test": "test"
   },
-  "_description": "Makes a sprite out of an array of urls",
+  "description": "Makes a sprite out of an array of urls",
   "bugs": {
     "url": "https://github.com/vigour-io/shutter/issues"
   },
