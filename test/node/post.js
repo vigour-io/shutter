@@ -45,9 +45,7 @@ describe('POST /image/:width/:height', function () {
     it(effect, attempt(fullPath, effect))
   })
   after(function (done) {
-    handle.close(function () {
-      done()
-    })
+    handle.close(done)
   })
 })
 
@@ -87,9 +85,7 @@ describe('POST /image', function () {
     it(effect, attempt(fullPath, effect))
   })
   after(function (done) {
-    handle.close(function () {
-      done()
-    })
+    handle.close(done)
   })
 })
 

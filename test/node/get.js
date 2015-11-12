@@ -1,12 +1,12 @@
 'use strict'
 
 var path = require('path')
-var http = require('http')
 var Shutter = require('../../')
 var fs = require('vigour-fs/lib/server')
 var Promise = require('promise')
-var readdir = Promise.denodeify(fs.readdir)
 var writeFile = Promise.denodeify(fs.writeFile)
+var attempt = require('../attempt')
+var expectCachedFiles = require('../expectCachedFiles')
 var sampleImage = 'https://upload.wikimedia.org/wikipedia/commons/8/8c/JPEG_example_JPG_RIP_025.jpg'
 var encoded = encodeURIComponent(sampleImage)
 var base = '/image/600/400?url=' + encoded
@@ -43,13 +43,12 @@ describe('Clean', function () {
 })
 
 describe('Routes', function () {
-  before(function (done) {
+  before(function () {
     this.timeout(5000)
     var shutter = new Shutter()
-    shutter.start()
+    return shutter.start()
       .then(function (_handle) {
         handle = _handle
-        done()
       })
   })
 
@@ -76,7 +75,7 @@ describe('Routes', function () {
       var attempts = effects.concat(png, jpg)
       attempts.map(function (effect) {
         var fullPath = base + effect
-        it('`' + effect + '`', attempt(fullPath))
+        it('`' + effect + '`', attempt(fullPath, port, host))
       })
     })
   })
@@ -103,7 +102,7 @@ describe('Routes', function () {
       var attempts = effects.concat(png, jpg)
       attempts.map(function (effect) {
         var fullPath = baseWidthHeight + effect
-        it('`' + effect + '`', attempt(fullPath))
+        it('`' + effect + '`', attempt(fullPath, port, host))
       })
     })
   })
@@ -112,7 +111,7 @@ describe('Routes', function () {
   describe('GET /image/:id/:width/:height', function () {
     this.timeout(30000)
     it('should find the correct image and serve a resized version'
-      , attempt('/image/310b69fb4db50d3fc4374d2365cdc93a/900/600'))
+      , attempt('/image/310b69fb4db50d3fc4374d2365cdc93a/900/600', port, host))
   })
 
   describe('Caching', function () {
@@ -124,7 +123,7 @@ describe('Routes', function () {
       var shutter = new Shutter({ clean: true })
       shutter.start()
         .then(function () {
-          attempt(base + '&cache=false')()
+          attempt(base + '&cache=false', port, host)()
             .then(function () {
               // Give it time to clean up
               setTimeout(function () {
@@ -137,61 +136,6 @@ describe('Routes', function () {
   })
 
   after(function (done) {
-    handle.close(function () {
-      done()
-    })
+    handle.close(done)
   })
 })
-
-function expectCachedFiles (bool) {
-  return readdir(outPath)
-    .then(check)
-    .then(function () {
-      return readdir(originalsPath)
-    })
-    .then(check)
-
-  function check (files) {
-    var important = files.filter(function (item) {
-      return item !== '.gitignore' && item !== '.DS_Store'
-    })
-    if (bool) {
-      expect(important.length).to.be.gt(0)
-    } else {
-      expect(important.length).to.equal(0)
-    }
-  }
-}
-
-function attempt (fullPath) {
-  return function () {
-    return new Promise(function (resolve, reject) {
-      var reqOptions =
-        { path: fullPath,
-          port: port,
-          hostname: host
-        }
-      // console.log("reqOptions", reqOptions)
-      var req = http.request(reqOptions
-      , function (res) {
-        var total = ''
-        res.on('error', reject)
-        res.on('data', function (chunk) {
-          total += chunk
-        })
-        res.on('end', function () {
-          if (res.statusCode !== 200) {
-            console.log('RESULT', total.toString())
-          }
-          expect(res.statusCode).to.equal(200)
-          resolve()
-        })
-      })
-      req.on('error', reject)
-      req.end()
-    })
-    .catch(function (reason) {
-      console.error('An error occured', reason)
-    })
-  }
-}

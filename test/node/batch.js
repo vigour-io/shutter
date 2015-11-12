@@ -19,9 +19,7 @@ describe('batch (timeout: 5min)', function () {
       })
   })
   after(function (done) {
-    handle.close(function () {
-      done()
-    })
+    handle.close(done)
   })
 
   it('post'

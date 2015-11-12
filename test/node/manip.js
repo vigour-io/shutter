@@ -17,9 +17,7 @@ describe('Manip', function () {
       })
   })
   after(function (done) {
-    handle.close(function () {
-      done()
-    })
+    handle.close(done)
   })
 
   it.skip('should succeed immediately if no manipulations are provided'
