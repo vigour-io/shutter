@@ -24,7 +24,6 @@
   },
   "homepage": "https://github.com/vigour-io/shutter",
   "dependencies": {
-    "cache": "git+ssh://git@github.com:vigour-io/read-through-cache.git#master",
     "diskspace": "^0.1.7",
     "express": "^4.7.4",
     "express-validator": "^2.4.0",
@@ -36,6 +35,7 @@
     "rimraf": "^2.2.8",
     "vigour-fs-promised": "^2.0.0",
     "vigour-js": "^0.2.2",
+    "vigour-read-through-cache": "^1.0.1",
     "ws": "^0.4.32"
   },
   "devDependencies": {
