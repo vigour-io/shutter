@@ -34,15 +34,9 @@
     "query-string": "^2.4.1",
     "rimraf": "^2.2.8",
     "vigour-fs-promised": "^2.0.0",
-    "vigour-js": "^0.2.2",
-    "vigour-read-through-cache": "^1.0.1",
-    "ws": "^0.4.32"
+    "vigour-js": "^0.2.2"
   },
   "devDependencies": {
-    "body-parser": "^1.13.2",
-    "chai": "^3.2.0",
-    "colors": "^1.1.2",
-    "form-data": "^0.2.0",
     "github-markdown-css": "^2.0.9",
     "lodash": "^3.10.1"
   },
