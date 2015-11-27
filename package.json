@@ -78,7 +78,7 @@
     },
     "port": {
       "val": 8000,
-      "env": "IMG_PORT",
+      "_env": "IMG_PORT",
       "_description": "Port on which the server should listen"
     },
     "maxWidth": {
@@ -92,7 +92,7 @@
     },
     "convertPath": {
       "val": "/usr/bin/convert",
-      "env": "IMG_CONVERT_PATH",
+      "_env": "IMG_CONVERT_PATH",
       "_description": "Path to Image Magick's `convert` executable"
     },
     "clean": {
@@ -102,7 +102,7 @@
     "manip": {},
     "verbose": {
       "val": false,
-      "env": "IMG_VERBOSE",
+      "_env": "IMG_VERBOSE",
       "_description": "Logs successful requests"
     },
     "remote": {
