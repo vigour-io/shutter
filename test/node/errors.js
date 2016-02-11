@@ -16,7 +16,7 @@ describe('Errors', function () {
     var s = false
     var i = false
     this.timeout(5000)
-    serverHandle = server.listen(serverPort, function () {
+    serverHandle = server.listen(serverPort, '127.0.0.1', function () {
       s = true
       finish()
     })
