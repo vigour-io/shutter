@@ -31,6 +31,7 @@
     "express": "^4.7.4",
     "express-validator": "^2.4.0",
     "gm": "^1.16.0",
+    "lodash": "3.10.x",
     "marked": "^0.3.3",
     "npmlog": "^0.1.1",
     "promise": "^6.1.0",
@@ -41,8 +42,7 @@
     "vigour-js": "^0.4.4"
   },
   "devDependencies": {
-    "github-markdown-css": "^2.0.9",
-    "lodash": "^3.10.1"
+    "github-markdown-css": "^2.0.9"
   },
   "keywords": [
     "javascript",
