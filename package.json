@@ -11,7 +11,7 @@
     "shutter": "./bin/index.js"
   },
   "scripts": {
-    "start": "forever bin/index.js",
+    "start": "./bin/index.js",
     "test": "gaston test -r node -s ./test/node",
     "clean": "./bin/index.js -x"
   },
@@ -38,7 +38,7 @@
     "promise": "^6.1.0",
     "query-string": "^2.4.1",
     "rimraf": "^2.2.8",
-    "vigour-config": "^0.0.9",
+    "vigour-config": "^0.0.13",
     "vigour-fs-promised": "^2.0.0",
     "vigour-js": "^0.4.4"
   },
@@ -76,7 +76,7 @@
       "val": 6
     },
     "invalidRequestMessage": {
-      "val": "Invalid request. Make sure you are respecting the sprite maker api (https://github.com/vigour-io/shutter/blob/master/README.md#user-content-api) and that the requested data exists."
+      "val": "Invalid request. Make sure you are respecting the api (https://github.com/vigour-io/shutter/blob/master/README.md#user-content-api) and that the requested data exists."
     },
     "port": {
       "val": 8000,
@@ -114,6 +114,12 @@
     "remotePort": {
       "val": 80,
       "_description": "port on which to reach the remote image server"
+    },
+    "fallbacks": {
+      "_description": "json string describing fallback images. see README.md"
+    },
+    "retryOn404": {
+      "val": false
     }
   },
   "standard": {

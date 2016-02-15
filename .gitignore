@@ -6,7 +6,8 @@ forever.log
 log.stdout
 log.stderr
 nohup.out
-
+run.json
+run.sh
 bundle.*
 build.*
 
