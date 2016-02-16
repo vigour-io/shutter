@@ -9,6 +9,7 @@ Image manipulation service
 - GET `/image/:width/:height?url=<SOURCE_IMAGE_URL>` (see `test/node/get.js`)
 - GET `/invalidate/<any of the above>` : Removes the corresponding image from cache (both the requested image and the original unmodified download or posted file)
 - In all cases, add `&cache=false` if you don't want the resulting image to be cached on the server.
+- In all cases, add `&fallback=<URL>` if you want to provide a fallback image for the cases when reqested image can't be downloaded
 - (*Obsolete*) GET `/image/:id/:width/:height`
 
 
