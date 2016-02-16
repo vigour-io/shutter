@@ -12,11 +12,45 @@ Image manipulation service
 - In all cases, add `&fallback=<URL>` if you want to provide a fallback image for the cases when reqested image can't be downloaded
 - (*Obsolete*) GET `/image/:id/:width/:height`
 
-
 #### Notes
 - Both width and height have a maximum of 10000
 - Check https://github.com/vigour-io/shutter/tree/master/images for available masks and overlays
 - Check http://www.imagemagick.org/Usage/blur/blur_montage.jpg for blur arguments radius and sigma (<radius>x<sigma>)
+
+### Fallback images
+
+If you ask the shutter for an image it can not find, it will try responding with a fallback image of the same dimensions following this procedure:
+
+1. If you have included `&fallback=<URL>` in your query string, the image found at that URL will be downloaded, resized, and sent as a fallback image, along with the following extra header: `X-Fallback-Type: 'provided'`
+2. If not, Shutter will look at the domain of the requested image and try to match it with one of the domains provided to shutter on startup (see below). If the domain is found, the fallback associated to that domain will be downloaded, resized, and sent as a fallback image, along with the following extra header: `X-Fallback-Type: 'domain'`
+3. If the domain doesn't match any of the domains provided to Shutter on startup, Shutter will download, resize and send the default fallback image provided to Shutter on startup (see below), along with the following extra header: `X-Fallback-Type: 'default'`
+
+To provide the Shutter with a default fallback image, set its `fallbacks` property value to the URL of the desired fallback image (example below)
+To provide the Shutter with domain-specific fallbacks, add some properties to its `fallbacks` property with the key being a domain and the value being a URL (example below)
+
+#### Example
+
+##### One-time fallback image
+```sh
+GET /image?url=http://uhohIdontexist.com/returns404.png&width=900&height=600&fallback=http://thankgodIexist.com/img.png
+```
+##### Configuring fallback images:
+
+***fallbackConfig.json***
+```json
+{
+  "fallbacks": {
+    "val": "<DEFAULT_FALLBACK_URL>",
+    "somedomain.com": "<FALLBACK_URL_FOR_somedomain.com>",
+    "anotherdomain.com": "<FALLBACK_URL_FOR_anotherdomain.com>"
+  }
+}
+```
+
+Don't forget to merge the config when starting the shutter
+```sh
+shutter --mergeFiles '["./fallbackConfig.json"]'
+```
 
 #### Effects
 See `test/node/post.js` and `test/node/get.js`
