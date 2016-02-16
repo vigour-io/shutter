@@ -38,7 +38,7 @@
     "promise": "^6.1.0",
     "query-string": "^2.4.1",
     "rimraf": "^2.2.8",
-    "vigour-config": "^0.0.13",
+    "vigour-config": "~0.0.13",
     "vigour-fs-promised": "^2.0.0",
     "vigour-js": "^0.4.4"
   },
