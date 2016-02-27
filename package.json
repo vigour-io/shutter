@@ -40,7 +40,8 @@
     "rimraf": "^2.2.8",
     "vigour-config": "~0.0.13",
     "vigour-fs-promised": "^2.0.0",
-    "vigour-js": "^0.4.4"
+    "vigour-js": "^0.4.4",
+    "vigour-spawn": "^1.0.6"
   },
   "keywords": [
     "javascript",
@@ -95,6 +96,11 @@
     "convertPath": {
       "val": "/usr/bin/convert",
       "_env": "IMG_CONVERT_PATH",
+      "_description": "Path to Image Magick's `convert` executable"
+    },
+    "identifyPath": {
+      "val": "/usr/bin/identify",
+      "_env": "IMG_IDENTIFY_PATH",
       "_description": "Path to Image Magick's `convert` executable"
     },
     "clean": {
