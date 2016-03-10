@@ -1,6 +1,6 @@
 {
   "name": "vigour-shutter",
-  "version": "2.0.24",
+  "version": "2.0.25",
   "author": "Vigour <dev@vigour.io>",
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/vigour-io/shutter",
   "dependencies": {
+    "aws-sdk": "^2.2.42",
     "diskspace": "^0.1.7",
     "express": "^4.7.4",
     "express-validator": "^2.4.0",
@@ -127,6 +128,29 @@
     },
     "retryOn404": {
       "val": false
+    },
+    "aws": {
+      "accessKeyId": {
+        "val": false,
+        "description": "Access Key ID for authenticating requests against AWS",
+        "_env": "SHUTTER_AWS_ACCESS_KEY_ID"
+      },
+      "secretAccessKey": {
+        "val": false,
+        "description": "Secret Access Key for authenticating requests against AWS",
+        "_env": "SHUTTER_AWS_SECRET_ACCESS_KEY"
+      },
+      "cloudfront": {
+        "apiVersion": {
+          "val": "2016-01-28",
+          "description": "aws-sdk api version to use when invalidating cloudfront assets"
+        },
+        "distributionId": {
+          "val": false,
+          "description": "ID of the distribution on CloudFront on which to perform invalidations",
+          "_env": "SHUTTER_CLOUDFRONT_DISTRIBUTION_ID"
+        }
+      }
     }
   },
   "standard": {
