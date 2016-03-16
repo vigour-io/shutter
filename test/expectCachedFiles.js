@@ -1,6 +1,6 @@
 var path = require('path')
 var fs = require('vigour-fs-promised')
-var root = path.join(__dirname, '..')
+var root = process.cwd()
 var outPath = path.join(root, 'out')
 var originalsPath = path.join(root, 'originals')
 
