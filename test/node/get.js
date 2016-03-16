@@ -17,7 +17,7 @@ var baseWidthHeight = '/image?width=600&height=400&url=' + encoded
 var host = 'localhost'
 var port = 8000
 var handle
-var root = path.join(__dirname, '..', '..')
+var root = process.cwd()
 var outPath = path.join(root, 'out')
 var originalsPath = path.join(root, 'originals')
 
