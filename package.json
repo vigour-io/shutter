@@ -103,7 +103,7 @@
     "identifyPath": {
       "val": "/usr/bin/identify",
       "_env": "IMG_IDENTIFY_PATH",
-      "_description": "Path to Image Magick's `convert` executable"
+      "_description": "Path to Image Magick's `identify` executable"
     },
     "clean": {
       "val": false,
