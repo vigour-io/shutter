@@ -51,7 +51,8 @@
     "graphicsMagick"
   ],
   "contributors": [
-    "Shawn Inder <shawn@vigour.io>"
+    "Shawn Inder <shawn@vigour.io>",
+    "Boite Witte <boite@vigour.io>"
   ],
   "license": "MIT",
   "gaston": {
