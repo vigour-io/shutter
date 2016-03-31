@@ -61,7 +61,13 @@ module.exports = {
   clean: {
     doc: 'Removes all downloaded originals, produced images and temporary folders and files, then exits',
     format: Boolean,
-    default: false
+    default: false,
+    arg: 'clean'
+  },
+  manip: {
+    doc: 'Manipulations of images',
+    format: Array,
+    default: []
   },
   remote: {
     host: {

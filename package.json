@@ -12,6 +12,7 @@
   },
   "scripts": {
     "start": "./bin/index.js",
+    "debug": "./bin/index.js --debug",
     "test": "gaston test -r node -s ./test/node",
     "clean": "./bin/index.js -x"
   },
