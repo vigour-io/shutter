@@ -81,8 +81,23 @@ module.exports = {
       default: 80
     }
   },
+  server: {
+    ip: {
+      doc: 'IP for the server',
+      format: String,
+      env: 'SHUTTER_SERVER_IP'
+    },
+    port: {
+      doc: 'Port for the server to listen',
+      format: Number,
+      default: 8000,
+      env: 'SHUTTER_SERVER_PORT'
+    }
+  },
   fallbacks: {
-    doc: 'JSON string describing fallback images. see README.md'
+    doc: 'JSON string describing fallback images. see README.md',
+    format: Object,
+    default: {}
   },
   retryOn404: {
     doc: 'Should we try to retrieve the image again on 404',
@@ -112,7 +127,8 @@ module.exports = {
         distributionId: {
           doc: 'ID of the distribution on CloudFront on which to perform invalidations',
           format: String,
-          default: 'SHUTTER_CLOUDFRONT_DISTRIBUTION_ID'
+          default: null,
+          env: 'SHUTTER_CLOUDFRONT_DISTRIBUTION_ID'
         }
       }
     }

@@ -14,7 +14,7 @@ var http = require('http')
 
 function randomRequest (options) {
   options.path = randomSrc()
-  console.log('options', options)
+  // console.log('options', options)
   return new Promise(function (resolve, reject) {
     var req = http.request(options, function (res) {
         res.on('error', function (e) {

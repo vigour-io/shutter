@@ -15,6 +15,7 @@ describe('batch (timeout: 5min)', function () {
     var shutter = new Shutter()
     return shutter.start()
       .then(function (_handle) {
+        console.log('handle', _handle)
         handle = _handle
       })
   })

@@ -21,7 +21,7 @@ describe('Errors', function () {
       finish()
     })
 
-    var shutter = new Shutter({ maxTries: 2 })
+    var shutter = new Shutter({ maxTries: 1 })
     imgHandle = shutter.start()
       .then(function (_imgHandle) {
         imgHandle = _imgHandle
@@ -38,10 +38,14 @@ describe('Errors', function () {
   it('should send a 404 response when requested origin image is not found', function (done) {
     var req = http.request({
       path: '/image/400/600?url=http://localhost:' + serverPort,
-      port: 8000
+      port: 8000,
+      headers: {
+        hello: 'world'
+      }
     }
     , function (res) {
       res.on('error', function (err) {
+        console.log(req)
         console.error('res error', err)
         expect(err).not.to.exist
         done()
