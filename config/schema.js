@@ -51,12 +51,14 @@ module.exports = {
   convertPath: {
     doc: 'Path to Image Magick\'s `convert` executable',
     format: String,
-    default: '/usr/bin/convert'
+    default: '',
+    env: 'SHUTTER_CONVERT_PATH'
   },
   identifyPath: {
     doc: 'Path to Image Magick\'s `identify` executable',
     format: String,
-    default: '/usr/bin/indentify'
+    default: '',
+    env: 'SHUTTER_IDENTIFY_PATH'
   },
   clean: {
     doc: 'Removes all downloaded originals, produced images and temporary folders and files, then exits',

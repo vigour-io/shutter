@@ -45,8 +45,10 @@ describe('Manip', function () {
     this.timeout(20000)
     var shutter = new Shutter({
       convertPath: 'forceUseOfRemote',
-      remote: 'localhost',
-      remotePort: '8000',
+      remote: {
+        host: 'localhost',
+        port: '8000'
+      },
       manip: [{
         src: srcPath,
         dst: outPath,
@@ -70,8 +72,10 @@ describe('Manip', function () {
     this.timeout(20000)
     var shutter = new Shutter({
       convertPath: 'haha',
-      remote: 'localhost',
-      remotePort: '8000',
+      remote: {
+        host: 'localhost',
+        port: '8000'
+      },
       manip: [{
         src: srcPath,
         batch: [{
