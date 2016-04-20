@@ -16,3 +16,4 @@ bundles
 test.sh
 run.sh
 debug.sh
+npm-debug.log
