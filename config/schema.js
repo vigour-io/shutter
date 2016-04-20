@@ -108,17 +108,17 @@ module.exports = {
   },
   clients: {
     aws: {
-      accessKeyId: {
-        doc: 'Access Key ID for authenticating requests against AWS',
+      access_key_id: {
+        doc: 'AWS Access Key should be set to env: AWS_ACCESS_KEY_ID',
         format: String,
         default: null,
-        env: 'SHUTTER_AWS_ACCESS_KEY_ID'
+        env: 'AWS_ACCESS_KEY_ID'
       },
-      secretAccesKey: {
-        doc: 'Secret Access Key for authenticating requests against AWS',
+      secret_access_key: {
+        doc: 'AWS Secret Access Key should be set to env: AWS_SECRET_ACCESS_KEY',
         format: String,
         default: null,
-        env: 'SHUTTER_AWS_SECRET_ACCESS_KEY'
+        env: 'AWS_SECRET_ACCESS_KEY'
       },
       cloudfront: {
         apiVersion: {
@@ -130,7 +130,7 @@ module.exports = {
           doc: 'ID of the distribution on CloudFront on which to perform invalidations',
           format: String,
           default: null,
-          env: 'SHUTTER_CLOUDFRONT_DISTRIBUTION_ID'
+          env: 'AWS_CLOUDFRONT_DISTRIBUTION_ID'
         }
       }
     }

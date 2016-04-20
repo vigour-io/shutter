@@ -12,6 +12,12 @@ As a minimum, you will to provide the following configuration options:
 - `convertPath` (`IMG_CONVERT_PATH`)
 - `identifyPath` (`IMG_IDENTIFY_PATH`)
 
+And for AWS:
+
+- Access Key Id (`AWS_ACCESS_KEY_ID`)
+- Access Secret (`AWS_SECRET_ACCESS_KEY`)
+- Cloudfront Distribution ID (`AWS_CLOUDFRONT_DISTRIBUTION_ID`)
+
 ### Dependencies
 - ImageMagick `brew install ImageMagick` or `sudo yum install ImageMagick`
 

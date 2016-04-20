@@ -82,7 +82,9 @@ var awsMock = {
 }
 
 var config = {
-  distributionId: 'SOMECRAZYID'
+  cloudfront: {
+    distributionId: 'SOMECRAZYID'
+  }
 }
 
 var paths = ['/apath', '/a/n/o/t/h/e/r%20path']
