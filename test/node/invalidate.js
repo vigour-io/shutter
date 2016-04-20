@@ -89,7 +89,7 @@ var paths = ['/apath', '/a/n/o/t/h/e/r%20path']
 
 describe('CloudFront Invalidation', function () {
   it('should call the mock with correct parameters', function () {
-    return awsInvalidate(awsMock, config, paths)
+    return awsInvalidate(config, paths, awsMock)
       .then(() => {
         expect(count).to.equal(1)
       })
