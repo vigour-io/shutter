@@ -46,7 +46,7 @@ module.exports = {
   minFreeSpace: {
     doc: 'The minimum amount of free space needed',
     format: Number,
-    default: 0.1
+    default: 0.3
   },
   convertPath: {
     doc: 'Path to Image Magick\'s `convert` executable',
