@@ -1,6 +1,6 @@
 'use strict'
 module.exports = {
   logger: {
-    name: 'vigour-gwf-develop'
+    name: 'vigour-shutter-develop'
   }
 }
