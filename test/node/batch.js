@@ -90,8 +90,10 @@ describe('batch (timeout: 5min)', function () {
         batch: manips
       }],
       convertPath: 'forceRemote',
-      remote: 'localhost',
-      remotePort: '8000'
+      remote: {
+        host: 'localhost',
+        port: '8000'
+      }
     }
 
     var shutter = new Shutter(obj)
